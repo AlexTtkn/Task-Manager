@@ -54,7 +54,7 @@ class UserControllerTest {
                 .ignore(Select.field(User::getId))
                 .supply(Select.field(User::getFirstname), () -> faker.name().firstName())
                 .supply(Select.field(User::getLastname), () -> faker.name().lastName())
-                .supply(Select.field(User::getPassword), () -> faker.internet().password(3, 12))
+                .supply(Select.field(User::getPasswordDigest), () -> faker.internet().password(3, 12))
                 .supply(Select.field(User::getEmail), () -> faker.internet().emailAddress())
                 .create();
     }
@@ -123,7 +123,7 @@ class UserControllerTest {
         assertThat(user.getFirstname()).isEqualTo(data.get("firstname"));
         assertThat(user.getLastname()).isEqualTo(data.get("lastname"));
         assertThat(user.getEmail()).isEqualTo(data.get("email"));
-        assertThat(user.getPassword()).isEqualTo(data.get("password"));
+        assertThat(user.getPasswordDigest()).isEqualTo(data.get("password"));
     }
 
     @Test
@@ -144,7 +144,7 @@ class UserControllerTest {
 
         assertThat(user).isNotNull();
         assertThat(user.getEmail()).isEqualTo(dataWithoutFirstNameAndLastName.get("email"));
-        assertThat(user.getPassword()).isEqualTo(dataWithoutFirstNameAndLastName.get("password"));
+        assertThat(user.getPasswordDigest()).isEqualTo(dataWithoutFirstNameAndLastName.get("password"));
     }
 
     @Test
@@ -206,7 +206,7 @@ class UserControllerTest {
         assertThat(updatedUser.getEmail()).isEqualTo(data.get("email"));
         assertThat(updatedUser.getFirstname()).isEqualTo(data.get("firstname"));
         assertThat(updatedUser.getLastname()).isEqualTo(data.get("lastname"));
-        assertThat(updatedUser.getPassword()).isEqualTo(data.get("password"));
+        assertThat(updatedUser.getPasswordDigest()).isEqualTo(data.get("password"));
     }
 
     @Test
@@ -232,7 +232,7 @@ class UserControllerTest {
         assertThat(updatedUser.getEmail()).isEqualTo(testUser.getEmail());
         assertThat(updatedUser.getFirstname()).isEqualTo(data.get("firstname"));
         assertThat(updatedUser.getLastname()).isEqualTo(data.get("lastname"));
-        assertThat(updatedUser.getPassword()).isEqualTo(testUser.getPassword());
+        assertThat(updatedUser.getPasswordDigest()).isEqualTo(testUser.getPasswordDigest());
 
     }
 
