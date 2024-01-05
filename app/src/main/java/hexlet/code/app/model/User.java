@@ -34,10 +34,8 @@ public class User implements UserDetails, BaseEntity {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @NotBlank
     private String firstname;
 
-    @NotBlank
     private String lastname;
 
     @Email
