@@ -13,7 +13,7 @@ public class UserUpdateDto {
 
     @NotNull
     @Size(min = 3)
-    private JsonNullable<String> password;
+    private JsonNullable<String> passwordDigest;
 
     @NotNull
     @Email
