@@ -71,7 +71,7 @@ class UserControllerTest {
         var createdAt = java.util.Date.from(testUser.getCreatedAt().atStartOfDay()
                 .atZone(ZoneId.systemDefault()).toInstant());
 
-        var request = get("/api/users/{id}", testUser.getId()).with(token);
+        var request = get("/api/users/{id}", testUser.getId()).with(jwt());
         var result = mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andReturn();
@@ -138,7 +138,7 @@ class UserControllerTest {
                 "passwordDigest", faker.internet().password(3, 12)
         );
 
-        var request = post("/api/users").with(token)
+        var request = post("/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(dataWithoutFirstNameAndLastName));
 
@@ -149,7 +149,7 @@ class UserControllerTest {
 
         assertThat(user).isNotNull();
         assertThat(user.getEmail()).isEqualTo(dataWithoutFirstNameAndLastName.get("email"));
-        assertThat(user.getPasswordDigest()).isEqualTo(dataWithoutFirstNameAndLastName.get("passwordDigest"));
+        assertThat(user.getPasswordDigest()).isNotEqualTo(dataWithoutFirstNameAndLastName.get("passwordDigest"));
     }
 
     @Test
@@ -192,11 +192,11 @@ class UserControllerTest {
                 "email", faker.internet().emailAddress(),
                 "firstname", faker.name().firstName(),
                 "lastname", faker.name().lastName(),
-                "password", faker.internet().password(3, 12)
+                "passwordDigest", faker.internet().password(3, 12)
         );
 
         var jwt = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
-        var request = put("/api/users/" + testUser.getId()).with(jwt)
+        var request = put("/api/users/{id}", testUser.getId()).with(jwt)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(data));
 
@@ -209,7 +209,7 @@ class UserControllerTest {
         assertThat(updatedUser.getEmail()).isEqualTo(data.get("email"));
         assertThat(updatedUser.getFirstname()).isEqualTo(data.get("firstname"));
         assertThat(updatedUser.getLastname()).isEqualTo(data.get("lastname"));
-        assertThat(updatedUser.getPasswordDigest()).isEqualTo(data.get("password"));
+        assertThat(updatedUser.getPasswordDigest()).isNotEqualTo(data.get("passwordDigest"));
     }
 
     @Test
@@ -219,7 +219,8 @@ class UserControllerTest {
                 "lastname", faker.name().lastName()
         );
 
-        var request = put("/api/users/" + testUser.getId()).with(token)
+        var jwt = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
+        var request = put("/api/users/{id}", testUser.getId()).with(jwt)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(data));
 
@@ -235,17 +236,22 @@ class UserControllerTest {
         assertThat(updatedUser.getPasswordDigest()).isEqualTo(testUser.getPasswordDigest());
 
     }
-
     @Test
-    public void testDeleteUser() throws Exception {
-        userRepository.save(testUser);
-
-        var request = delete("/api/users/{id}", testUser.getId()).with(token);
+    public void testDestroy() throws Exception {
+        var jwt = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
+        var request = delete("/api/users/{id}", testUser.getId()).with(jwt);
         mockMvc.perform(request)
                 .andExpect(status().isNoContent());
 
-        testUser = userRepository.findById(testUser.getId()).orElse(null);
-        assertThat(testUser).isNull();
+        var user = userRepository.findById(testUser.getId()).orElse(null);
+        assertThat(user).isNull();
+    }
+
+    @Test
+    public void testDestroyWithoutAuth() throws Exception {
+        var request = delete("/api/users/{id}", testUser.getId());
+        mockMvc.perform(request)
+                .andExpect(status().isUnauthorized());
     }
 
 }
