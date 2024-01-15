@@ -20,7 +20,7 @@ public class WelcomeControllerTest {
 
     @Test
     public void testWelcome() throws Exception {
-        var request = get("/welcome").with(jwt());
+        var request = get("/welcome");
 
         var result = mockMvc.perform(request)
                 .andExpect(status().isOk())
