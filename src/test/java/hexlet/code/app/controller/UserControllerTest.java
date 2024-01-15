@@ -7,6 +7,7 @@ import hexlet.code.app.repository.UserRepository;
 import hexlet.code.app.util.ModelGenerator;
 import net.datafaker.Faker;
 import org.instancio.Instancio;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,10 +61,10 @@ class UserControllerTest {
         userRepository.save(testUser);
     }
 
-//    @AfterEach
-//    public void cleanUp() {
-//        userRepository.deleteById(testUser.getId());
-//    }
+    @AfterEach
+    public void cleanUp() {
+        userRepository.deleteById(testUser.getId());
+    }
 
 
     @Test
