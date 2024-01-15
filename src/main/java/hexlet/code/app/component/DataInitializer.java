@@ -1,6 +1,6 @@
 package hexlet.code.app.component;
 
-import hexlet.code.app.dto.UserDTO.UserCreateDto;
+import hexlet.code.app.dto.UserDTO.UserCreateDTO;
 import hexlet.code.app.mapper.UserMapper;
 import hexlet.code.app.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -21,7 +21,7 @@ public class DataInitializer implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        var userData = new UserCreateDto();
+        var userData = new UserCreateDTO();
         userData.setEmail("hexlet@example.com");
         userData.setPasswordDigest("qwerty");
         var user = userMapper.map(userData);

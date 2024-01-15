@@ -7,7 +7,7 @@ import java.time.LocalDate;
 
 @Setter
 @Getter
-public class UserDto {
+public class UserDTO {
 
     private Long id;
     private String firstname;

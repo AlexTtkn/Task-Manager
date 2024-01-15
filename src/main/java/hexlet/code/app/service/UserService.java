@@ -1,8 +1,8 @@
 package hexlet.code.app.service;
 
-import hexlet.code.app.dto.UserDTO.UserCreateDto;
-import hexlet.code.app.dto.UserDTO.UserDto;
-import hexlet.code.app.dto.UserDTO.UserUpdateDto;
+import hexlet.code.app.dto.UserDTO.UserCreateDTO;
+import hexlet.code.app.dto.UserDTO.UserDTO;
+import hexlet.code.app.dto.UserDTO.UserUpdateDTO;
 import hexlet.code.app.exception.ResourceNotFoundException;
 import hexlet.code.app.mapper.UserMapper;
 import hexlet.code.app.repository.UserRepository;
@@ -21,26 +21,26 @@ public class UserService {
     private UserMapper userMapper;
 
 
-    public List<UserDto> getAllUsers() {
+    public List<UserDTO> getAllUsers() {
         return userRepository.findAll().stream()
                 .map(userMapper::map)
                 .toList();
     }
 
-    public UserDto createUser(UserCreateDto dto) {
+    public UserDTO createUser(UserCreateDTO dto) {
         var user = userMapper.map(dto);
         userRepository.save(user);
         return userMapper.map(user);
     }
 
-    public UserDto findById(Long userId) {
+    public UserDTO findById(Long userId) {
         var user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id: " + userId + " not found."));
 
         return userMapper.map(user);
     }
 
-    public UserDto updateUser(Long userId, UserUpdateDto data) {
+    public UserDTO updateUser(Long userId, UserUpdateDTO data) {
         var user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id: " + userId + " not found."));
         userMapper.update(data, user);

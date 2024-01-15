@@ -1,8 +1,8 @@
 package hexlet.code.app.mapper;
 
-import hexlet.code.app.dto.UserDTO.UserCreateDto;
-import hexlet.code.app.dto.UserDTO.UserDto;
-import hexlet.code.app.dto.UserDTO.UserUpdateDto;
+import hexlet.code.app.dto.UserDTO.UserCreateDTO;
+import hexlet.code.app.dto.UserDTO.UserDTO;
+import hexlet.code.app.dto.UserDTO.UserUpdateDTO;
 import hexlet.code.app.model.User;
 
 import org.mapstruct.Mapper;
@@ -25,15 +25,10 @@ public abstract class UserMapper {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public abstract User map(UserCreateDto userCreateDto);
+    public abstract User map(UserCreateDTO userCreateDto);
 
-    public abstract UserDto map(User user);
+    public abstract UserDTO map(User user);
 
-    public abstract void update(UserUpdateDto data, @MappingTarget User model);
+    public abstract void update(UserUpdateDTO data, @MappingTarget User model);
 
-    @BeforeMapping
-    public void encryptPassword(UserCreateDto data) {
-        var password = data.getPasswordDigest();
-        data.setPasswordDigest(passwordEncoder.encode(password));
-    }
 }

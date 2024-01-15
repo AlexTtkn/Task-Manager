@@ -9,11 +9,15 @@ import org.openapitools.jackson.nullable.JsonNullable;
 
 @Setter
 @Getter
-public class UserUpdateDto {
+public class UserUpdateDTO {
 
     @NotNull
     @Size(min = 3)
     private JsonNullable<String> passwordDigest;
+
+    private JsonNullable<String> firstName;
+
+    private JsonNullable<String> lastName;
 
     @NotNull
     @Email

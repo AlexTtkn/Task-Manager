@@ -8,7 +8,7 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class UserCreateDto {
+public class UserCreateDTO {
 
     private String firstname;
     private String lastname;
