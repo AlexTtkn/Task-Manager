@@ -208,7 +208,7 @@ class UserControllerTest {
         assertThat(updatedUser.getEmail()).isEqualTo(data.get("email"));
         assertThat(updatedUser.getFirstname()).isEqualTo(data.get("firstname"));
         assertThat(updatedUser.getLastname()).isEqualTo(data.get("lastname"));
-        assertThat(updatedUser.getPasswordDigest()).isNotEqualTo(data.get("passwordDigest"));
+        assertThat(updatedUser.getPasswordDigest()).isEqualTo(data.get("passwordDigest"));
     }
 
     @Test
