@@ -49,6 +49,7 @@ public class TaskStatusController {
     }
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
         taskStatusService.deleteStatus(id);
     }
