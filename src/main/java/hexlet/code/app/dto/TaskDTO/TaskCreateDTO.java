@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 public class TaskCreateDTO {
 
-    private Integer index;
+    private Long index;
 
     @JsonProperty("assignee_id")
     private Long assigneeId;

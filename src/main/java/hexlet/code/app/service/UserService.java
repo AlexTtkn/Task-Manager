@@ -52,6 +52,10 @@ public class UserService {
         var user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id: " + userId + " not found."));
         userMapper.update(data, user);
+
+        var hashedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPasswordDigest(hashedPassword);
+
         userRepository.save(user);
         return userMapper.map(user);
     }

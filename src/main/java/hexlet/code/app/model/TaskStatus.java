@@ -40,7 +40,7 @@ public class TaskStatus implements BaseEntity {
     private String slug;
 
     @CreatedDate
-    private LocalDate cratedAt;
+    private LocalDate createdAt;
 
     @OneToMany(mappedBy = "taskStatus", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Task> tasks = new ArrayList<>();

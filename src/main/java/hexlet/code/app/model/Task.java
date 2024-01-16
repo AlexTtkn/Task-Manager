@@ -2,6 +2,7 @@ package hexlet.code.app.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
@@ -38,12 +39,11 @@ public class Task implements BaseEntity {
     @CreatedDate
     private LocalDate createdAt;
 
-    @NotBlank
+    @NotNull
     @ManyToOne
     private TaskStatus taskStatus;
 
-    @NotNull
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private User assignee;
 
 }
