@@ -60,7 +60,9 @@ class TaskStatusControllerTest {
 
     @AfterEach
     public void cleanUp() {
-        taskStatusRepository.deleteById(testTaskStatus.getId());
+        if (testTaskStatus != null) {
+            taskStatusRepository.deleteById(testTaskStatus.getId());
+        }
     }
 
     @Test

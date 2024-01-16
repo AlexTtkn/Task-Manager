@@ -13,6 +13,7 @@ import hexlet.code.app.util.ModelGenerator;
 import net.datafaker.Faker;
 import org.instancio.Instancio;
 import org.instancio.Select;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openapitools.jackson.nullable.JsonNullable;
@@ -68,11 +69,15 @@ class TaskControllerTest {
         token = jwt().jwt(builder -> builder.subject("hexlet@example.com"));
     }
 
+    @AfterEach
+    public void cleanUp() {
+        taskRepository.deleteAll();
+    }
+
 
     private User generateUser() {
         return Instancio.of(modelGenerator.getUserModel()).create();
     }
-
     private Task generateTask() {
         var user = userRepository.findById(1L).get();
         var taskStatus = taskStatusRepository.findBySlug("draft").get();
@@ -155,7 +160,9 @@ class TaskControllerTest {
         userRepository.save(testUser);
 
         var testTask = generateTask();
+        taskStatusRepository.save(testTask.getTaskStatus());
         taskRepository.save(testTask);
+
 
         var updateDTO = new TaskUpdateDTO();
         updateDTO.setIndex(JsonNullable.of(faker.number().randomNumber()));

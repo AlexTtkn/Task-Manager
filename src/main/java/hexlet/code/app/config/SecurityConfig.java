@@ -41,7 +41,7 @@ public class SecurityConfig {
                         .requestMatchers("/welcome").permitAll()
                         .requestMatchers("/api/login").permitAll()
                         .requestMatchers("/api/users").permitAll()
-                        .requestMatchers("/api/task_statuses/**").permitAll()
+                     //   .requestMatchers("/api/task_statuses/**").permitAll()
                         .requestMatchers("/index.html").permitAll()
                         .requestMatchers("/assets/**").permitAll()
                         .anyRequest().authenticated())
