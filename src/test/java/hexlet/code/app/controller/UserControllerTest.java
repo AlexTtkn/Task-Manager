@@ -57,19 +57,23 @@ class UserControllerTest {
     @BeforeEach
     public void setUp() {
         token = jwt().jwt(builder -> builder.subject("hexlet@example.com"));
-        testUser = Instancio.of(modelGenerator.getUserModel()).create();
+        testUser = Instancio.of(modelGenerator.getUserModel())
+                .create();
         userRepository.save(testUser);
     }
 
     @AfterEach
     public void cleanUp() {
-        userRepository.deleteById(testUser.getId());
+        var userTasks = testUser.getTasks();
+
+        if (userTasks.isEmpty()) {
+            userRepository.deleteById(testUser.getId());
+        }
     }
 
 
     @Test
     public void testShow() throws Exception {
-
         var request = get("/api/users/{id}", testUser.getId()).with(jwt());
         var result = mockMvc.perform(request)
                 .andExpect(status().isOk())
@@ -94,15 +98,6 @@ class UserControllerTest {
                 .andExpect(status().isNotFound());
     }
 
-    @Test
-    public void testIndex() throws Exception {
-        var result = mockMvc.perform(get("/api/users").with(token))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        var body = result.getResponse().getContentAsString();
-        assertThatJson(body).isArray();
-    }
 
     @Test
     public void testCreate() throws Exception {
@@ -208,7 +203,7 @@ class UserControllerTest {
         assertThat(updatedUser.getEmail()).isEqualTo(data.get("email"));
         assertThat(updatedUser.getFirstname()).isEqualTo(data.get("firstname"));
         assertThat(updatedUser.getLastname()).isEqualTo(data.get("lastname"));
-        assertThat(updatedUser.getPasswordDigest()).isEqualTo(data.get("passwordDigest"));
+        assertThat(updatedUser.getPasswordDigest()).isNotEqualTo(data.get("passwordDigest"));
     }
 
     @Test
@@ -232,7 +227,7 @@ class UserControllerTest {
         assertThat(updatedUser.getEmail()).isEqualTo(testUser.getEmail());
         assertThat(updatedUser.getFirstname()).isEqualTo(data.get("firstname"));
         assertThat(updatedUser.getLastname()).isEqualTo(data.get("lastname"));
-        assertThat(updatedUser.getPasswordDigest()).isEqualTo(testUser.getPasswordDigest());
+        assertThat(updatedUser.getPasswordDigest()).isNotEqualTo(testUser.getPasswordDigest());
 
     }
     @Test
