@@ -7,7 +7,6 @@ import hexlet.code.app.mapper.UserMapper;
 import hexlet.code.app.repository.TaskStatusRepository;
 import hexlet.code.app.repository.UserRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,23 +18,19 @@ import java.util.List;
 @AllArgsConstructor
 public class DataInitializer implements ApplicationRunner {
 
-    @Autowired
     private UserRepository userRepository;
-
-    @Autowired
     private UserMapper userMapper;
-
-    @Autowired
-    private final TaskStatusRepository taskStatusRepository;
-
-    @Autowired
-    private final TaskStatusMapper taskStatusMapper;
-
-    @Autowired
-    private final PasswordEncoder passwordEncoder;
+    private TaskStatusRepository taskStatusRepository;
+    private TaskStatusMapper taskStatusMapper;
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        addAdminUser();
+        addDefaultSlugs();
+    }
+
+    public void addAdminUser() {
         var userData = new UserCreateDTO();
         userData.setEmail("hexlet@example.com");
         userData.setPasswordDigest("qwerty");
@@ -43,27 +38,26 @@ public class DataInitializer implements ApplicationRunner {
         var hashedPassword = passwordEncoder.encode(user.getPassword());
         user.setPasswordDigest(hashedPassword);
         userRepository.save(user);
+    }
 
-        List<String> defaultSlugs = List.of(
-                "draft", "to_review", "to_be_fixed", "to_publish", "published"
-        );
-
+    public void addDefaultSlugs() {
+        List<String> defaultSlugs = List.of("draft", "to_review", "to_be_fixed", "to_publish", "published");
         defaultSlugs.forEach(slug -> {
-            var taskStatusData = new TaskStatusCreateDTO();
+            var statusData = new TaskStatusCreateDTO();
             String[] arr = slug.split("_");
             String first = arr[0].substring(0, 1).toUpperCase() + arr[0].substring(1);
             var name = new StringBuilder(first);
 
             if (arr.length > 1) {
-                for (int i = 1; i < arr.length; i++) {
-                    name.append(" ").append(arr[i]);
+                for (var element: arr) {
+                    name.append(" ").append(element);
                 }
             }
 
-            taskStatusData.setName(name.toString());
-            taskStatusData.setSlug(slug);
-            var taskStatus = taskStatusMapper.map(taskStatusData);
-            taskStatusRepository.save(taskStatus);
+            statusData.setName(name.toString());
+            statusData.setSlug(slug);
+            var status = taskStatusMapper.map(statusData);
+            taskStatusRepository.save(status);
         });
     }
 }
