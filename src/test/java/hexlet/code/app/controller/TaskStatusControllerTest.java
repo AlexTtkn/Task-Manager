@@ -121,9 +121,9 @@ class TaskStatusControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(data));
 
-       var result =  mockMvc.perform(request)
+        var result = mockMvc.perform(request)
                 .andExpect(status().isCreated())
-               .andReturn();
+                .andReturn();
 
         var body = result.getResponse().getContentAsString();
 
