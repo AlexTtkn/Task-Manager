@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
 
 @Getter
 @Component
@@ -42,9 +43,13 @@ public class ModelGenerator {
 
         taskModel = Instancio.of(Task.class)
                 .ignore(Select.field(Task::getId))
-                .supply(Select.field(Task::getIndex), () -> (Long) faker.number().randomNumber())
+                .ignore(Select.field(Task::getCreatedAt))
+                .ignore(Select.field(Task::getAssignee))
+                .ignore(Select.field(Task::getTaskStatus))
                 .supply(Select.field(Task::getName), () -> faker.lorem().word())
+                .supply(Select.field(Task::getIndex), () -> faker.number().randomNumber())
                 .supply(Select.field(Task::getDescription), () -> faker.lorem().sentence())
+                .supply(Select.field(Task::getLabels), () -> new HashSet<Label>())
                 .toModel();
 
         taskStatusModel = Instancio.of(TaskStatus.class)
@@ -60,5 +65,6 @@ public class ModelGenerator {
                 .supply(Select.field(User::getLastname), () -> faker.name().lastName())
                 .supply(Select.field(User::getPasswordDigest), () -> faker.internet().password(3, 12))
                 .toModel();
+
     }
 }

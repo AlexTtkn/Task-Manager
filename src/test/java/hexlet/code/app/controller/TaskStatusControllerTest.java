@@ -1,7 +1,8 @@
 package hexlet.code.app.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import hexlet.code.app.mapper.TaskStatusMapper;
+import hexlet.code.app.dto.TaskStatusDTO.TaskStatusCreateDTO;
+import hexlet.code.app.dto.TaskStatusDTO.TaskStatusUpdateDTO;
 import hexlet.code.app.model.TaskStatus;
 import hexlet.code.app.repository.TaskStatusRepository;
 import hexlet.code.app.util.ModelGenerator;
@@ -9,6 +10,7 @@ import org.instancio.Instancio;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,7 +18,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Map;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,9 +42,6 @@ class TaskStatusControllerTest {
     private TaskStatusRepository taskStatusRepository;
 
     @Autowired
-    private TaskStatusMapper taskStatusMapper;
-
-    @Autowired
     private ModelGenerator modelGenerator;
 
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
@@ -53,8 +51,7 @@ class TaskStatusControllerTest {
     @BeforeEach
     public void setUp() {
         token = jwt().jwt(builder -> builder.subject("hexlet@example.com"));
-        testTaskStatus = Instancio.of(modelGenerator.getTaskStatusModel())
-                .create();
+        testTaskStatus = Instancio.of(modelGenerator.getTaskStatusModel()).create();
         taskStatusRepository.save(testTaskStatus);
     }
 
@@ -73,6 +70,7 @@ class TaskStatusControllerTest {
                 .andReturn();
 
         var body = result.getResponse().getContentAsString();
+
         assertThatJson(body).isArray();
     }
 
@@ -83,23 +81,21 @@ class TaskStatusControllerTest {
         var result = mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andReturn();
-        var body = result.getResponse().getContentAsString();
 
-        //в testTaskStatus есть поле createdAT, а в ответе это поле не приходит.
+        var body = result.getResponse().getContentAsString();
 
         assertThatJson(body).and(
                 v -> v.node("name").isEqualTo(testTaskStatus.getName()),
-                v -> v.node("slug").isEqualTo(testTaskStatus.getSlug())
-//                v -> v.node("createdAt").isEqualTo(testTaskStatus.getCratedAt())
+                v -> v.node("slug").isEqualTo(testTaskStatus.getSlug()),
+                v -> v.node("createdAt").isEqualTo(testTaskStatus.getCreatedAt().format(ModelGenerator.FORMATTER))
         );
     }
 
     @Test
     public void testUpdate() throws Exception {
-        var data = Map.of(
-                "name", "To test update",
-                "slug", "to_test_update"
-        );
+        var data = new TaskStatusUpdateDTO();
+        data.setName(JsonNullable.of("updated name"));
+        data.setSlug(JsonNullable.of("updated slug"));
 
         var request = put("/api/task_statuses/{id}", testTaskStatus.getId()).with(token)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -111,45 +107,55 @@ class TaskStatusControllerTest {
         var updatedTaskStatus = taskStatusRepository.findById(testTaskStatus.getId()).orElse(null);
 
         assertThat(updatedTaskStatus).isNotNull();
-        assertThat(updatedTaskStatus.getName()).isEqualTo(data.get("name"));
-        assertThat(updatedTaskStatus.getSlug()).isEqualTo(data.get("slug"));
+        assertThat(updatedTaskStatus.getName()).isEqualTo(data.getName().get());
+        assertThat(updatedTaskStatus.getSlug()).isEqualTo(data.getSlug().get());
     }
 
     @Test
     public void testCreate() throws Exception {
-        var data = Map.of(
-                "name", "To test create",
-                "slug", "to_test_create"
-        );
+        var data = new TaskStatusCreateDTO();
+        data.setName("created name");
+        data.setSlug("created slug");
 
         var request = post("/api/task_statuses").with(token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(data));
 
-        mockMvc.perform(request)
-                .andExpect(status().isCreated());
+       var result =  mockMvc.perform(request)
+                .andExpect(status().isCreated())
+               .andReturn();
 
-        var taskStatus = taskStatusRepository.findBySlug(data.get("slug")).orElse(null);
+        var body = result.getResponse().getContentAsString();
 
-        assertThat(taskStatus).isNotNull();
-        assertThat(taskStatus.getName()).isEqualTo(data.get("name"));
-        assertThat(taskStatus.getSlug()).isEqualTo(data.get("slug"));
+        var id = om.readTree(body).get("id").asLong();
+        assertThat(taskStatusRepository.findById(id)).isPresent();
+
+        var addedTaskStatus = taskStatusRepository.findBySlug(data.getSlug()).orElse(null);
+
+        assertThat(addedTaskStatus).isNotNull();
+        assertThatJson(body).and(
+                v -> v.node("id").isEqualTo(addedTaskStatus.getId()),
+                v -> v.node("name").isEqualTo(addedTaskStatus.getName()),
+                v -> v.node("createdAt").isEqualTo(addedTaskStatus.getCreatedAt().format(ModelGenerator.FORMATTER))
+        );
     }
 
     @Test
     public void testDestroy() throws Exception {
-        System.out.println(testTaskStatus.getId());
         var request = delete("/api/task_statuses/{id}", testTaskStatus.getId()).with(token);
+
         mockMvc.perform(request)
                 .andExpect(status().isNoContent());
 
         testTaskStatus = taskStatusRepository.findById(testTaskStatus.getId()).orElse(null);
+
         assertThat(testTaskStatus).isNull();
     }
 
     @Test
     public void testDestroyWithoutAuth() throws Exception {
         var request = delete("/api/task_statuses/{id}", testTaskStatus.getId());
+
         mockMvc.perform(request)
                 .andExpect(status().isUnauthorized());
     }
