@@ -43,7 +43,7 @@ public class Task implements BaseEntity {
     private LocalDate createdAt;
 
     @NotNull
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private TaskStatus taskStatus;
 
     @ManyToOne(fetch = FetchType.EAGER)

@@ -1,5 +1,6 @@
 package hexlet.code.app.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -41,7 +42,7 @@ public class TaskStatus implements BaseEntity {
     @CreatedDate
     private LocalDate createdAt;
 
-    @OneToMany(mappedBy = "taskStatus")
+    @OneToMany(mappedBy = "taskStatus", cascade = CascadeType.MERGE)
     private List<Task> tasks = new ArrayList<>();
 
 }
