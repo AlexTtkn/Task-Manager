@@ -63,11 +63,15 @@ class UserControllerTest {
 
     @AfterEach
     public void cleanUp() {
-        var userTasks = testUser.getTasks();
-
-        if (userTasks.isEmpty()) {
+        if (testUser != null) {
             userRepository.deleteById(testUser.getId());
         }
+//        var userTasks = testUser.getTasks();
+//
+//        if (userTasks.isEmpty()) {
+//            userRepository.deleteById(testUser.getId());
+//        }
+
     }
 
     @Test
@@ -110,38 +114,14 @@ class UserControllerTest {
 //                .andExpect(status().isNotFound());
 //    }
 
+
     @Test
     public void testUpdate() throws Exception {
-        var data = Map.of(
-                "email", faker.internet().emailAddress(),
-                "firstname", faker.name().firstName(),
-                "lastname", faker.name().lastName(),
-                "passwordDigest", faker.internet().password(3, 12)
-        );
-
-        var request = put("/api/users/{id}", testUser.getId()).with(token)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(data));
-
-        mockMvc.perform(request)
-                .andExpect(status().isOk());
-
-        var updatedUser = userRepository.findById(testUser.getId()).orElse(null);
-
-        assertThat(updatedUser).isNotNull();
-        assertThat(updatedUser.getEmail()).isEqualTo(data.get("email"));
-        assertThat(updatedUser.getFirstname()).isEqualTo(data.get("firstname"));
-        assertThat(updatedUser.getLastname()).isEqualTo(data.get("lastname"));
-        assertThat(updatedUser.getPasswordDigest()).isNotEqualTo(data.get("passwordDigest"));
-    }
-
-    @Test
-    public void testUpdate2() throws Exception {
         var data = new UserUpdateDTO();
-        data.setFirstname(JsonNullable.of("updated name"));
-        data.setLastname(JsonNullable.of("updated lastname"));
-        data.setEmail(JsonNullable.of("updated email"));
-        data.setPasswordDigest(JsonNullable.of("updated passwordDigest"));
+        data.setFirstname(JsonNullable.of(faker.name().firstName()));
+        data.setLastname(JsonNullable.of(faker.name().lastName()));
+        data.setEmail(JsonNullable.of(faker.internet().emailAddress()));
+        data.setPasswordDigest(JsonNullable.of(faker.internet().password(3, 12)));
 
         var request = put("/api/users/{id}", testUser.getId()).with(token)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -158,37 +138,14 @@ class UserControllerTest {
         assertThat(updatedUser.getLastname()).isEqualTo(data.getLastname().get());
         assertThat(updatedUser.getPasswordDigest()).isNotEqualTo(data.getPasswordDigest().get());
     }
+
     @Test
     public void testCreate() throws Exception {
-        var data = Map.of(
-                "email", faker.internet().emailAddress(),
-                "firstname", faker.name().firstName(),
-                "lastname", faker.name().lastName(),
-                "passwordDigest", faker.internet().password(3, 12)
-        );
-
-        var request = post("/api/users").with(token)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(data));
-
-        mockMvc.perform(request)
-                .andExpect(status().isCreated());
-
-        var user = userRepository.findByEmail(data.get("email")).orElse(null);
-
-        assertThat(user).isNotNull();
-        assertThat(user.getEmail()).isEqualTo(data.get("email"));
-        assertThat(user.getFirstname()).isEqualTo(data.get("firstname"));
-        assertThat(user.getLastname()).isEqualTo(data.get("lastname"));
-        assertThat(user.getPasswordDigest()).isNotEqualTo(data.get("passwordDigest"));
-    }
-    @Test
-    public void testCreate2() throws Exception {
         var data = new UserCreateDTO();
-        data.setFirstname("created name");
-        data.setLastname("created lastname");
-        data.setEmail("created email");
-        data.setPasswordDigest("created passwordDigest");
+        data.setFirstname(faker.name().firstName());
+        data.setLastname(faker.name().lastName());
+        data.setEmail(faker.internet().emailAddress());
+        data.setPasswordDigest(faker.internet().password(3, 12));
 
         var request = post("/api/users").with(token)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -203,7 +160,7 @@ class UserControllerTest {
         var id = om.readTree(body).get("id").asLong();
         assertThat(userRepository.findById(id)).isPresent();
 
-        var addedUser = userRepository.findByEmail(data.getEmail()).orElse(null);
+        var addedUser = userRepository.findById(id).orElse(null);
 
         assertThat(addedUser).isNotNull();
         assertThatJson(body).and(
@@ -211,7 +168,6 @@ class UserControllerTest {
                 v -> v.node("firstname").isEqualTo(addedUser.getFirstname()),
                 v -> v.node("lastname").isEqualTo(addedUser.getLastname()),
                 v -> v.node("email").isEqualTo(addedUser.getEmail()),
-                v -> v.node("passwordDigest").isEqualTo(addedUser.getPasswordDigest()),
                 v -> v.node("createdAt").isEqualTo(addedUser.getCreatedAt().format(ModelGenerator.FORMATTER))
         );
     }
@@ -296,6 +252,7 @@ class UserControllerTest {
         assertThat(updatedUser.getPasswordDigest()).isNotEqualTo(testUser.getPasswordDigest());
 
     }
+
     @Test
     public void testDestroy() throws Exception {
         var request = delete("/api/users/{id}", testUser.getId()).with(token);

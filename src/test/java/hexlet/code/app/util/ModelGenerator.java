@@ -37,7 +37,8 @@ public class ModelGenerator {
     private void init() {
         labelModel = Instancio.of(Label.class)
                 .ignore(Select.field(Label::getId))
-                .supply(Select.field(Label::getName), () -> "new")
+                .ignore(Select.field(Task::getCreatedAt))
+                .supply(Select.field(Label::getName), () -> faker.lorem().word() + "aa")
                 .supply(Select.field(Label::getTasks), () -> new ArrayList<Task>())
                 .toModel();
 
@@ -52,14 +53,18 @@ public class ModelGenerator {
                 .supply(Select.field(Task::getLabels), () -> new HashSet<Label>())
                 .toModel();
 
+        var slugAndName = faker.lorem().word();
         taskStatusModel = Instancio.of(TaskStatus.class)
                 .ignore(Select.field(TaskStatus::getId))
-                .supply(Select.field(TaskStatus::getName), () -> "To test")
-                .supply(Select.field(TaskStatus::getSlug), () -> "to_test")
+                .ignore(Select.field(Task::getCreatedAt))
+                .supply(Select.field(TaskStatus::getName), () -> slugAndName)
+                .supply(Select.field(TaskStatus::getSlug), () -> slugAndName)
+                .supply(Select.field(TaskStatus::getTasks), () -> new ArrayList<Task>())
                 .toModel();
 
         userModel = Instancio.of(User.class)
                 .ignore(Select.field(User::getId))
+                .ignore(Select.field(Task::getCreatedAt))
                 .supply(Select.field(User::getEmail), () -> faker.internet().emailAddress())
                 .supply(Select.field(User::getFirstname), () -> faker.name().firstName())
                 .supply(Select.field(User::getLastname), () -> faker.name().lastName())

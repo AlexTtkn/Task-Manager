@@ -5,11 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.app.dto.LabelDTO.LabelCreateDTO;
 import hexlet.code.app.dto.LabelDTO.LabelUpdateDTO;
 import hexlet.code.app.model.Label;
+import hexlet.code.app.model.TaskStatus;
 import hexlet.code.app.repository.LabelRepository;
 import hexlet.code.app.repository.TaskRepository;
 import hexlet.code.app.repository.TaskStatusRepository;
 import hexlet.code.app.repository.UserRepository;
 import hexlet.code.app.util.ModelGenerator;
+import net.datafaker.Faker;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,6 +40,9 @@ class LabelControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private Faker faker;
 
     @Autowired
     private ObjectMapper om;
@@ -108,7 +113,7 @@ class LabelControllerTest {
     @Test
     public void testUpdate() throws Exception {
         var data = new LabelUpdateDTO();
-        data.setName(JsonNullable.of("updated name"));
+        data.setName(JsonNullable.of(faker.name().name()));
 
         var request = put("/api/labels/{id}", testLabel.getId()).with(token)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -126,7 +131,7 @@ class LabelControllerTest {
     @Test
     public void testCreate() throws Exception {
         var data = new LabelCreateDTO();
-        data.setName("created name");
+        data.setName(faker.name().name());
 
         var request = post("/api/labels").with(token)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -141,7 +146,7 @@ class LabelControllerTest {
         var id = om.readTree(body).get("id").asLong();
         assertThat(labelRepository.findById(id)).isPresent();
 
-        var addedLabel = labelRepository.findByName(data.getName()).orElse(null);
+        var addedLabel = labelRepository.findById(id).orElse(null);
 
         assertThat(addedLabel).isNotNull();
         assertThatJson(body).and(
@@ -172,8 +177,24 @@ class LabelControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
-//    @Test
-//    public void testDestroyButLabelIsUsing() throws Exception {
-//
-//    }
+    @Test
+    public void testDestroyButHasTask() throws Exception {
+        TaskStatus taskStatus = new TaskStatus();
+        taskStatus.setSlug("slug");
+        taskStatus.setName("name");
+        taskStatusRepository.save(taskStatus);
+
+
+        var task = Instancio.of(modelGenerator.getTaskModel()).create();
+        task.setTaskStatus(taskStatus);
+        taskRepository.save(task);
+
+        task.getLabels().add(testLabel);
+        testLabel.getTasks().add(task);
+
+        var label = task.getLabels().iterator().next();
+
+        mockMvc.perform(delete("/api/labels/{id}", label.getId()).with(token))
+                .andExpect(status().isMethodNotAllowed());
+    }
 }

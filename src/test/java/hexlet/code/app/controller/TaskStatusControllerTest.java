@@ -6,6 +6,7 @@ import hexlet.code.app.dto.TaskStatusDTO.TaskStatusUpdateDTO;
 import hexlet.code.app.model.TaskStatus;
 import hexlet.code.app.repository.TaskStatusRepository;
 import hexlet.code.app.util.ModelGenerator;
+import net.datafaker.Faker;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +35,9 @@ class TaskStatusControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private Faker faker;
 
     @Autowired
     private ObjectMapper om;
@@ -94,8 +98,8 @@ class TaskStatusControllerTest {
     @Test
     public void testUpdate() throws Exception {
         var data = new TaskStatusUpdateDTO();
-        data.setName(JsonNullable.of("updated name"));
-        data.setSlug(JsonNullable.of("updated slug"));
+        data.setName(JsonNullable.of(faker.name().name()));
+        data.setSlug(JsonNullable.of(faker.lorem().word()));
 
         var request = put("/api/task_statuses/{id}", testTaskStatus.getId()).with(token)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -114,8 +118,8 @@ class TaskStatusControllerTest {
     @Test
     public void testCreate() throws Exception {
         var data = new TaskStatusCreateDTO();
-        data.setName("created name");
-        data.setSlug("created slug");
+        data.setName(faker.name().name());
+        data.setSlug(faker.lorem().word());
 
         var request = post("/api/task_statuses").with(token)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -130,7 +134,7 @@ class TaskStatusControllerTest {
         var id = om.readTree(body).get("id").asLong();
         assertThat(taskStatusRepository.findById(id)).isPresent();
 
-        var addedTaskStatus = taskStatusRepository.findBySlug(data.getSlug()).orElse(null);
+        var addedTaskStatus = taskStatusRepository.findById(id).orElse(null);
 
         assertThat(addedTaskStatus).isNotNull();
         assertThatJson(body).and(
