@@ -2,6 +2,7 @@ package hexlet.code.app.controller;
 
 import hexlet.code.app.dto.TaskDTO.TaskCreateDTO;
 import hexlet.code.app.dto.TaskDTO.TaskDTO;
+import hexlet.code.app.dto.TaskDTO.TaskParamsDTO;
 import hexlet.code.app.dto.TaskDTO.TaskUpdateDTO;
 import hexlet.code.app.service.TaskService;
 import jakarta.validation.Valid;
@@ -27,8 +28,8 @@ public class TaskController {
     private TaskService taskService;
 
     @GetMapping
-    public List<TaskDTO> index() {
-        return taskService.getAllTasks();
+    public List<TaskDTO> index(TaskParamsDTO paramsDTO) {
+        return taskService.getAllTasks(paramsDTO);
     }
 
     @GetMapping("/{id}")
