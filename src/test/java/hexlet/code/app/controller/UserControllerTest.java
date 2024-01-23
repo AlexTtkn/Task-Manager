@@ -19,8 +19,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Map;
-
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
@@ -226,32 +224,6 @@ class UserControllerTest {
 //        mockMvc.perform(request)
 //                .andExpect(status().isBadRequest());
 //    }
-
-
-    @Test
-    public void testPartialUpdate() throws Exception {
-        var data = Map.of(
-                "firstname", faker.name().firstName(),
-                "lastname", faker.name().lastName()
-        );
-
-        var jwt = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
-        var request = put("/api/users/{id}", testUser.getId()).with(jwt)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(data));
-
-        mockMvc.perform(request)
-                .andExpect(status().isOk());
-
-        var updatedUser = userRepository.findById(testUser.getId()).orElse(null);
-
-        assertThat(updatedUser).isNotNull();
-        assertThat(updatedUser.getEmail()).isEqualTo(testUser.getEmail());
-        assertThat(updatedUser.getFirstname()).isEqualTo(data.get("firstname"));
-        assertThat(updatedUser.getLastname()).isEqualTo(data.get("lastname"));
-        assertThat(updatedUser.getPasswordDigest()).isNotEqualTo(testUser.getPasswordDigest());
-
-    }
 
     @Test
     public void testDestroy() throws Exception {

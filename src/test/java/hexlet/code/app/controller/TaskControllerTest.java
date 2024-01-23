@@ -4,20 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.app.dto.TaskDTO.TaskCreateDTO;
 import hexlet.code.app.dto.TaskDTO.TaskUpdateDTO;
 import hexlet.code.app.mapper.TaskMapper;
-import hexlet.code.app.model.Label;
 import hexlet.code.app.model.Task;
-import hexlet.code.app.model.TaskStatus;
-import hexlet.code.app.model.User;
 import hexlet.code.app.repository.LabelRepository;
 import hexlet.code.app.repository.TaskRepository;
 import hexlet.code.app.repository.TaskStatusRepository;
 import hexlet.code.app.repository.UserRepository;
 import hexlet.code.app.util.ModelGenerator;
-import lombok.Getter;
 import net.datafaker.Faker;
 import net.javacrumbs.jsonunit.core.Option;
 import org.instancio.Instancio;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,16 +23,18 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
-
+import java.util.HashMap;
+import java.util.List;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -74,11 +71,7 @@ class TaskControllerTest {
 
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
 
-    @Getter
     private Task testTask;
-    private User testUser;
-    private TaskStatus testTaskStatus;
-    private Label testLabel;
 
     @BeforeEach
     public void setUp() {
@@ -89,18 +82,17 @@ class TaskControllerTest {
     private Task generateTask() {
         testTask = Instancio.of(modelGenerator.getTaskModel()).create();
 
-        testUser = Instancio.of(modelGenerator.getUserModel()).create();
+        var testUser = Instancio.of(modelGenerator.getUserModel()).create();
         userRepository.save(testUser);
         testTask.setAssignee(testUser);
 
-        testTaskStatus = Instancio.of(modelGenerator.getTaskStatusModel()).create();
+        var testTaskStatus = Instancio.of(modelGenerator.getTaskStatusModel()).create();
         taskStatusRepository.save(testTaskStatus);
         testTask.setTaskStatus(testTaskStatus);
 
-        testLabel = Instancio.of(modelGenerator.getLabelModel()).create();
+        var testLabel = Instancio.of(modelGenerator.getLabelModel()).create();
         labelRepository.save(testLabel);
         testTask.getLabels().add(testLabel);
-        testLabel.getTasks().add(testTask);
 
         return testTask;
     }
@@ -151,28 +143,21 @@ class TaskControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        var data = new Task();
-        data.setId(task.getId());
-        data.setName(task.getName());
-        data.setAssignee(task.getAssignee());
-        data.setTaskStatus(task.getTaskStatus());
-        data.setLabels(task.getLabels());
-        data.setCreatedAt(task.getCreatedAt());
+        var data = new HashMap<>();
+        data.put("assignee_id", task.getAssignee().getId());
+        data.put("content", task.getDescription());
+        data.put("createdAt", task.getCreatedAt().format(ModelGenerator.FORMATTER));
+        data.put("id", task.getId());
+        data.put("index", task.getIndex());
+        data.put("status", task.getTaskStatus().getSlug());
+        data.put("title", task.getName());
+        data.put("taskLabelIds", List.of(labelId));
 
         var body = result.getResponse().getContentAsString();
 
         assertThatJson(body).when(Option.IGNORING_ARRAY_ORDER)
                 .isArray()
                 .contains(om.writeValueAsString(data));
-
-//        assertThatJson(body).isArray().allSatisfy(elements ->
-//                assertThatJson(elements).and(
-//                        v -> v.node("title").isEqualTo(data.getName()),
-//                        v -> v.node("assignee").isEqualTo(data.getAssignee().getId()),
-//                        v -> v.node("status").isEqualTo(data.getTaskStatus().getSlug()),
-//                        v -> v.node("label").isEqualTo(data.getLabels().iterator().next())
-//                )
-//        );
     }
 
     @Test
@@ -201,19 +186,16 @@ class TaskControllerTest {
     }
 
     @Test
+    @Transactional
     public void testCreate() throws Exception {
-        var taskStatus = new TaskStatus();
-        taskStatus.setSlug("slug");
-        taskStatus.setName("name");
-        taskStatusRepository.save(taskStatus);
+        testTask = generateTask();
 
         var data = new TaskCreateDTO();
         data.setIndex(faker.number().randomNumber());
-        data.setAssigneeId(1L);
+        data.setAssigneeId(testTask.getAssignee().getId());
         data.setTitle(faker.lorem().word() + "aa");
         data.setContent(faker.lorem().sentence());
-        data.setStatus(taskStatus.getSlug());
-
+        data.setStatus(testTask.getTaskStatus().getSlug());
 
         var request = post("/api/tasks").with(token)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -234,24 +216,24 @@ class TaskControllerTest {
         assertThatJson(body).and(
                 v -> v.node("id").isEqualTo(addedTask.getId()),
                 v -> v.node("index").isEqualTo(addedTask.getIndex()),
-                v -> v.node("assigneeId").isEqualTo(addedTask.getAssignee().getId()),
+                v -> v.node("assignee_id").isEqualTo(addedTask.getAssignee().getId()),
                 v -> v.node("status").isEqualTo(addedTask.getTaskStatus().getSlug()),
                 v -> v.node("content").isEqualTo(addedTask.getDescription()),
                 v -> v.node("title").isEqualTo(addedTask.getName()),
                 v -> v.node("createdAt").isEqualTo(addedTask.getCreatedAt().format(ModelGenerator.FORMATTER))
         );
-
     }
 
 
     @Test
+    @Transactional
     public void testUpdate() throws Exception {
         testTask = generateTask();
         taskRepository.save(testTask);
 
         var updateDTO = new TaskUpdateDTO();
         updateDTO.setIndex(JsonNullable.of(faker.number().randomNumber()));
-        updateDTO.setAssigneeId(JsonNullable.of(testUser.getId()));
+        updateDTO.setAssigneeId(JsonNullable.of(testTask.getAssignee().getId()));
         updateDTO.setTitle(JsonNullable.of(faker.lorem().word() + "aa"));
         updateDTO.setContent(JsonNullable.of(faker.lorem().sentence()));
         updateDTO.setStatus(JsonNullable.of(faker.lorem().word()));
@@ -267,10 +249,10 @@ class TaskControllerTest {
 
         assertThat(updatedTask).isNotNull();
         assertThat(updatedTask.getIndex()).isEqualTo(updateDTO.getIndex().get());
-        assertThat(updatedTask.getAssignee().getId()).isEqualTo(updateDTO.getAssigneeId().get());
         assertThat(updatedTask.getName()).isEqualTo(updateDTO.getTitle().get());
         assertThat(updatedTask.getDescription()).isEqualTo(updateDTO.getContent().get());
         assertThat(updatedTask.getTaskStatus().getSlug()).isEqualTo(updateDTO.getStatus().get());
+        assertThat(updatedTask.getAssignee().getId()).isEqualTo(updateDTO.getAssigneeId().get());
     }
 
     @Test
