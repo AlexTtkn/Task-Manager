@@ -20,7 +20,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 
@@ -53,7 +52,6 @@ public class User implements UserDetails, BaseEntity {
     @LastModifiedDate
     private LocalDate updatedAt;
 
-    private List<Task> tasks = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
