@@ -7,6 +7,8 @@ import hexlet.code.app.dto.TaskDTO.TaskUpdateDTO;
 import hexlet.code.app.exception.ResourceNotFoundException;
 import hexlet.code.app.mapper.TaskMapper;
 import hexlet.code.app.repository.TaskRepository;
+import hexlet.code.app.repository.TaskStatusRepository;
+import hexlet.code.app.repository.UserRepository;
 import hexlet.code.app.specification.TaskSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,13 @@ public class TaskService {
     private TaskMapper taskMapper;
 
     @Autowired
+    private TaskStatusRepository taskStatusRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+
+    @Autowired
     private TaskSpecification specBuilder;
 
     public List<TaskDTO> getAllTasks(TaskParamsDTO paramsDTO) {
@@ -34,6 +43,17 @@ public class TaskService {
 
     public TaskDTO createTask(TaskCreateDTO dto) {
         var task = taskMapper.map(dto);
+
+        var assigneeId = dto.getAssigneeId();
+        if (assigneeId != null) {
+            var assignee = userRepository.findById(assigneeId).orElse(null);
+            task.setAssignee(assignee);
+        }
+
+        var statusSlug = dto.getStatus();
+        var taskStatus = taskStatusRepository.findBySlug(statusSlug).orElse(null);
+        task.setTaskStatus(taskStatus);
+
         taskRepository.save(task);
         return taskMapper.map(task);
     }
@@ -47,7 +67,24 @@ public class TaskService {
     public TaskDTO updateTask(Long taskId, TaskUpdateDTO data) {
         var task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Task with id: " + taskId + " not found."));
+
         taskMapper.update(data, task);
+
+        var assigneeId = data.getAssigneeId();
+        var assignee = userRepository.findById((assigneeId).get()).orElse(null);
+        task.setAssignee(assignee);
+        if (assignee != null) {
+            userRepository.save(assignee);
+        }
+
+
+        var statusSlug = data.getStatus();
+        var taskStatus = taskStatusRepository.findBySlug((statusSlug).get()).orElse(null);
+        task.setTaskStatus(taskStatus);
+        if (taskStatus != null) {
+            taskStatusRepository.save(taskStatus);
+        }
+
         taskRepository.save(task);
         return taskMapper.map(task);
     }

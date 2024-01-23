@@ -34,7 +34,7 @@ public abstract class TaskMapper {
     @Autowired
     private LabelRepository labelRepository;
 
-    @Mapping(source = "assigneeId", target = "assignee")
+    @Mapping(source = "assigneeId", target = "assignee.id")
     @Mapping(source = "status", target = "taskStatus.slug")
     @Mapping(source = "title", target = "name")
     @Mapping(source = "content", target = "description")
@@ -48,7 +48,7 @@ public abstract class TaskMapper {
     @Mapping(source = "labels", target = "taskLabelIds")
     public abstract TaskDTO map(Task task);
 
-    @Mapping(source = "assigneeId", target = "assignee")
+    @Mapping(source = "assigneeId", target = "assignee.id")
     @Mapping(source = "status", target = "taskStatus.slug")
     @Mapping(source = "title", target = "name")
     @Mapping(source = "content", target = "description")
