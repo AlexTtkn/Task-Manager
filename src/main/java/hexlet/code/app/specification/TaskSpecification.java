@@ -37,4 +37,5 @@ public class TaskSpecification {
                 ? cb.conjunction()
                 : cb.equal(root.get("labels").get("id"), labelId);
     }
+
 }

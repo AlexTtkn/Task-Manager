@@ -64,12 +64,6 @@ class UserControllerTest {
         if (testUser != null) {
             userRepository.deleteById(testUser.getId());
         }
-//        var userTasks = testUser.getTasks();
-//
-//        if (userTasks.isEmpty()) {
-//            userRepository.deleteById(testUser.getId());
-//        }
-
     }
 
     @Test
@@ -101,17 +95,6 @@ class UserControllerTest {
                 v -> v.node("createdAt").isEqualTo(testUser.getCreatedAt().format(ModelGenerator.FORMATTER))
         );
     }
-
-//    @Test
-//    public void testShowUserNotFound() throws Exception {
-//        Long id = 100L;
-//        userRepository.deleteById(id);
-//
-//        var request = get("/api/users/{id}", id).with(token);
-//        mockMvc.perform(request)
-//                .andExpect(status().isNotFound());
-//    }
-
 
     @Test
     public void testUpdate() throws Exception {
@@ -169,61 +152,6 @@ class UserControllerTest {
                 v -> v.node("createdAt").isEqualTo(addedUser.getCreatedAt().format(ModelGenerator.FORMATTER))
         );
     }
-
-//    @Test
-//    public void testCreateWithoutFirstNameAndLastName() throws Exception {
-//        var dataWithoutFirstNameAndLastName = Map.of(
-//                "email", faker.internet().emailAddress(),
-//                "passwordDigest", faker.internet().password(3, 12)
-//        );
-//
-//        var request = post("/api/users")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(om.writeValueAsString(dataWithoutFirstNameAndLastName));
-//
-//        mockMvc.perform(request)
-//                .andExpect(status().isCreated());
-//
-//        var user = userRepository.findByEmail(dataWithoutFirstNameAndLastName.get("email")).orElse(null);
-//
-//        assertThat(user).isNotNull();
-//        assertThat(user.getEmail()).isEqualTo(dataWithoutFirstNameAndLastName.get("email"));
-//        assertThat(user.getPasswordDigest()).isNotEqualTo(dataWithoutFirstNameAndLastName.get("passwordDigest"));
-//    }
-
-//    @Test
-//    public void testCreateWithInvalidPassword() throws Exception {
-//        var dataWithInvalidPassword = Map.of(
-//                "email", faker.internet().emailAddress(),
-//                "firstname", faker.name().firstName(),
-//                "lastname", faker.name().lastName(),
-//                "password", faker.internet().password(1, 2)
-//        );
-//
-//        var request = post("/api/users")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(om.writeValueAsString(dataWithInvalidPassword));
-//
-//        mockMvc.perform(request)
-//                .andExpect(status().isBadRequest());
-//    }
-
-//    @Test
-//    public void testCreateWithInvalidEmail() throws Exception {
-//        var dataWithInvalidEmail = Map.of(
-//                "email", faker.name().username(),
-//                "firstname", faker.name().firstName(),
-//                "lastname", faker.name().lastName(),
-//                "password", faker.internet().password(3, 12)
-//        );
-//
-//        var request = post("/api/users")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(om.writeValueAsString(dataWithInvalidEmail));
-//
-//        mockMvc.perform(request)
-//                .andExpect(status().isBadRequest());
-//    }
 
     @Test
     public void testDestroy() throws Exception {
