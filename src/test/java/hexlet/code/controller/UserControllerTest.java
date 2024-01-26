@@ -89,8 +89,8 @@ class UserControllerTest {
         var body = result.getResponse().getContentAsString();
 
         assertThatJson(body).and(
-                v -> v.node("firstname").isEqualTo(testUser.getFirstname()),
-                v -> v.node("lastname").isEqualTo(testUser.getLastname()),
+                v -> v.node("firstName").isEqualTo(testUser.getFirstName()),
+                v -> v.node("lastName").isEqualTo(testUser.getLastName()),
                 v -> v.node("email").isEqualTo(testUser.getEmail()),
                 v -> v.node("createdAt").isEqualTo(testUser.getCreatedAt().format(ModelGenerator.FORMATTER))
         );
@@ -99,8 +99,8 @@ class UserControllerTest {
     @Test
     public void testUpdate() throws Exception {
         var data = new UserUpdateDTO();
-        data.setFirstname(JsonNullable.of(faker.name().firstName()));
-        data.setLastname(JsonNullable.of(faker.name().lastName()));
+        data.setFirstName(JsonNullable.of(faker.name().firstName()));
+        data.setLastName(JsonNullable.of(faker.name().lastName()));
         data.setEmail(JsonNullable.of(faker.internet().emailAddress()));
         data.setPasswordDigest(JsonNullable.of(faker.internet().password(3, 12)));
 
@@ -115,16 +115,16 @@ class UserControllerTest {
 
         assertThat(updatedUser).isNotNull();
         assertThat(updatedUser.getEmail()).isEqualTo(data.getEmail().get());
-        assertThat(updatedUser.getFirstname()).isEqualTo(data.getFirstname().get());
-        assertThat(updatedUser.getLastname()).isEqualTo(data.getLastname().get());
+        assertThat(updatedUser.getFirstName()).isEqualTo(data.getFirstName().get());
+        assertThat(updatedUser.getLastName()).isEqualTo(data.getLastName().get());
         assertThat(updatedUser.getPasswordDigest()).isNotEqualTo(data.getPasswordDigest().get());
     }
 
     @Test
     public void testCreate() throws Exception {
         var data = new UserCreateDTO();
-        data.setFirstname(faker.name().firstName());
-        data.setLastname(faker.name().lastName());
+        data.setFirstName(faker.name().firstName());
+        data.setLastName(faker.name().lastName());
         data.setEmail(faker.internet().emailAddress());
         data.setPasswordDigest(faker.internet().password(3, 12));
 
@@ -146,8 +146,8 @@ class UserControllerTest {
         assertThat(addedUser).isNotNull();
         assertThatJson(body).and(
                 v -> v.node("id").isEqualTo(addedUser.getId()),
-                v -> v.node("firstname").isEqualTo(addedUser.getFirstname()),
-                v -> v.node("lastname").isEqualTo(addedUser.getLastname()),
+                v -> v.node("firstName").isEqualTo(addedUser.getFirstName()),
+                v -> v.node("lastName").isEqualTo(addedUser.getLastName()),
                 v -> v.node("email").isEqualTo(addedUser.getEmail()),
                 v -> v.node("createdAt").isEqualTo(addedUser.getCreatedAt().format(ModelGenerator.FORMATTER))
         );
