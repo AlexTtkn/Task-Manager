@@ -6,6 +6,9 @@ import hexlet.code.dto.TaskDTO.TaskParamsDTO;
 import hexlet.code.dto.TaskDTO.TaskUpdateDTO;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.TaskMapper;
+import hexlet.code.model.Label;
+import hexlet.code.model.TaskStatus;
+import hexlet.code.model.User;
 import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
@@ -15,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class TaskService {
@@ -80,29 +84,50 @@ public class TaskService {
 
         taskMapper.update(data, task);
 
-        var assigneeId = data.getAssigneeId();
-        if (assigneeId != null) {
-            var assignee = userRepository.findById((assigneeId).get()).orElse(null);
-            task.setAssignee(assignee);
+//        var assigneeId = data.getAssigneeId();
+//        if (assigneeId != null) {
+//            var assignee = userRepository.findById((assigneeId).get()).orElse(null);
+//            task.setAssignee(assignee);
+//            assert assignee != null;
+//            userRepository.save(assignee);
+//        }
+        User assignee = null;
+        if (data.getTaskLabelIds() != null) {
+            assignee = userRepository.findById(data.getAssigneeId().get()).orElse(null);
             assert assignee != null;
             userRepository.save(assignee);
         }
+        task.setAssignee(assignee);
 
-        var statusSlug = data.getStatus();
-        if (statusSlug != null) {
-            var taskStatus = taskStatusRepository.findBySlug((statusSlug).get()).orElse(null);
-            task.setTaskStatus(taskStatus);
+//        var statusSlug = data.getStatus();
+//        if (statusSlug != null) {
+//            var taskStatus = taskStatusRepository.findBySlug((statusSlug).get()).orElse(null);
+//            task.setTaskStatus(taskStatus);
+//            assert taskStatus != null;
+//            taskStatusRepository.save(taskStatus);
+//        }
+        TaskStatus taskStatus = null;
+        if (data.getStatus() != null) {
+            taskStatus = taskStatusRepository.findBySlug((data.getStatus()).get()).orElse(null);
             assert taskStatus != null;
             taskStatusRepository.save(taskStatus);
         }
+        task.setTaskStatus(taskStatus);
 
-        var labels = data.getTaskLabelIds();
-        if (labels != null) {
-            var labelSet = labelRepository.findByIdIn((labels).get()).orElse(null);
-            task.setLabels(labelSet);
+//        var labels = data.getTaskLabelIds();
+//        if (labels != null) {
+//            var labelSet = labelRepository.findByIdIn((labels).get()).orElse(null);
+//            task.setLabels(labelSet);
+//            assert labelSet != null;
+//            labelRepository.save(labelSet.iterator().next());
+//        }
+        Set<Label> labelSet = null;
+        if (data.getTaskLabelIds() != null) {
+            labelSet = labelRepository.findByIdIn((data.getTaskLabelIds()).get()).orElse(null);
             assert labelSet != null;
             labelRepository.save(labelSet.iterator().next());
         }
+        task.setLabels(labelSet);
 
         taskRepository.save(task);
         return taskMapper.map(task);
