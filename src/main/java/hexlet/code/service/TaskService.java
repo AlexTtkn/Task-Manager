@@ -6,7 +6,6 @@ import hexlet.code.dto.TaskDTO.TaskParamsDTO;
 import hexlet.code.dto.TaskDTO.TaskUpdateDTO;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.TaskMapper;
-import hexlet.code.model.Label;
 import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
@@ -16,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class TaskService {
@@ -96,13 +94,14 @@ public class TaskService {
             task.setTaskStatus(taskStatus);
             assert taskStatus != null;
             taskStatusRepository.save(taskStatus);
-
         }
 
-        var labels = data.getTaskLabelIds().orElse(null);
-        if (!labels.isEmpty()) {
-            var labelsSet = labelRepository.findByIdIn(labels).orElse(null);
-            task.setLabels(labelsSet);
+        var labels = data.getTaskLabelIds();
+        if (labels != null) {
+            var labelSet = labelRepository.findByIdIn((labels).get()).orElse(null);
+            task.setLabels(labelSet);
+//            assert labelSet != null;
+//            labelRepository.save(taskMapper.toIds(labelSet));
         }
 
         taskRepository.save(task);
