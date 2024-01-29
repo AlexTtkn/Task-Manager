@@ -121,6 +121,7 @@ public class TaskService {
 //            assert labelSet != null;
 //            labelRepository.save(labelSet.iterator().next());
 //        }
+
         Set<Label> labelSet = null;
         if (data.getTaskLabelIds() != null) {
             labelSet = labelRepository.findByIdIn((data.getTaskLabelIds()).get()).orElse(null);
