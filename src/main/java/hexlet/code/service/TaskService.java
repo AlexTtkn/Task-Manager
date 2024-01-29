@@ -92,10 +92,12 @@ public class TaskService {
 
 
         var statusSlug = data.getStatus();
-        var taskStatus = taskStatusRepository.findBySlug((statusSlug).get()).orElse(null);
-        task.setTaskStatus(taskStatus);
-        if (taskStatus != null) {
+        if (statusSlug != null) {
+            var taskStatus = taskStatusRepository.findBySlug((statusSlug).get()).orElse(null);
+            task.setTaskStatus(taskStatus);
+            assert taskStatus != null;
             taskStatusRepository.save(taskStatus);
+
         }
 
         taskRepository.save(task);
