@@ -59,7 +59,7 @@ public class TaskService {
         task.setTaskStatus(taskStatus);
 
         var labels = dto.getTaskLabelIds();
-        if (!labels.isEmpty()) {
+        if (labels != null) {
             var labelsSet = labelRepository.findByIdIn(labels).orElse(null);
             task.setLabels(labelsSet);
         }
@@ -100,8 +100,8 @@ public class TaskService {
         if (labels != null) {
             var labelSet = labelRepository.findByIdIn((labels).get()).orElse(null);
             task.setLabels(labelSet);
-//            assert labelSet != null;
-//            labelRepository.save(taskMapper.toIds(labelSet));
+            assert labelSet != null;
+            labelRepository.save(labelSet.iterator().next());
         }
 
         taskRepository.save(task);
