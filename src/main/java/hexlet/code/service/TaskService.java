@@ -52,6 +52,8 @@ public class TaskService {
         if (assigneeId != null) {
             var assignee = userRepository.findById(assigneeId).orElse(null);
             task.setAssignee(assignee);
+            assert assignee != null;
+            userRepository.save(assignee);
         }
 
         var statusSlug = dto.getStatus();
@@ -81,13 +83,13 @@ public class TaskService {
         taskMapper.update(data, task);
 
         var assigneeId = data.getAssigneeId();
-        assert assigneeId != null;
-        var assignee = userRepository.findById((assigneeId).get()).orElse(null);
-        task.setAssignee(assignee);
-
-        if (assignee != null) {
+        if (assigneeId != null) {
+            var assignee = userRepository.findById((assigneeId).get()).orElse(null);
+            task.setAssignee(assignee);
+            assert assignee != null;
             userRepository.save(assignee);
         }
+
 
         var statusSlug = data.getStatus();
         var taskStatus = taskStatusRepository.findBySlug((statusSlug).get()).orElse(null);
