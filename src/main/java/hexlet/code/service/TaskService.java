@@ -52,21 +52,33 @@ public class TaskService {
     public TaskDTO createTask(TaskCreateDTO dto) {
         var task = taskMapper.map(dto);
 
-        var assigneeId = dto.getAssigneeId();
-        if (assigneeId != null) {
-            var assignee = userRepository.findById(assigneeId).orElse(null);
-            task.setAssignee(assignee);
+//        var assigneeId = dto.getAssigneeId();
+//        if (assigneeId != null) {
+//            var assignee = userRepository.findById(assigneeId).orElse(null);
+//            task.setAssignee(assignee);
+//        }
+
+        User assignee = null;
+        if (dto.getAssigneeId() != null) {
+            assignee = userRepository.findById(dto.getAssigneeId()).orElse(null);
         }
+        task.setAssignee(assignee);
 
         var statusSlug = dto.getStatus();
         var taskStatus = taskStatusRepository.findBySlug(statusSlug).orElse(null);
         task.setTaskStatus(taskStatus);
 
-        var labels = dto.getTaskLabelIds();
-        if (labels != null) {
-            var labelsSet = labelRepository.findByIdIn(labels).orElse(null);
-            task.setLabels(labelsSet);
+//        var labels = dto.getTaskLabelIds();
+//        if (labels != null) {
+//            var labelsSet = labelRepository.findByIdIn(labels).orElse(null);
+//            task.setLabels(labelsSet);
+//        }
+
+        Set<Label> labelSet = null;
+        if (dto.getTaskLabelIds() != null) {
+            labelSet = labelRepository.findByIdIn((dto.getTaskLabelIds())).orElse(null);
         }
+        task.setLabels(labelSet);
 
         taskRepository.save(task);
         return taskMapper.map(task);
