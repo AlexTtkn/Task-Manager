@@ -6,6 +6,7 @@ import hexlet.code.dto.TaskDTO.TaskParamsDTO;
 import hexlet.code.dto.TaskDTO.TaskUpdateDTO;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.TaskMapper;
+import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
@@ -29,6 +30,9 @@ public class TaskService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private LabelRepository labelRepository;
 
 
     @Autowired
@@ -54,6 +58,12 @@ public class TaskService {
         var taskStatus = taskStatusRepository.findBySlug(statusSlug).orElse(null);
         task.setTaskStatus(taskStatus);
 
+        var labels = dto.getTaskLabelIds();
+        if (!labels.isEmpty()) {
+            var labelSet = taskMapper.toLabelSet(labels);
+            task.setLabels(labelSet);
+        }
+
         taskRepository.save(task);
         return taskMapper.map(task);
     }
@@ -71,8 +81,10 @@ public class TaskService {
         taskMapper.update(data, task);
 
         var assigneeId = data.getAssigneeId();
+        assert assigneeId != null;
         var assignee = userRepository.findById((assigneeId).get()).orElse(null);
         task.setAssignee(assignee);
+
         if (assignee != null) {
             userRepository.save(assignee);
         }

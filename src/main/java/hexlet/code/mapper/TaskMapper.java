@@ -17,6 +17,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -59,10 +60,9 @@ public abstract class TaskMapper {
         return taskStatusRepository.findBySlug(slug)
                 .orElseThrow(() -> new ResourceNotFoundException("Status not found"));
     }
-
-    public List<Label> toEntities(List<Long> labelIds) {
-        return labelRepository.findByIdIn(labelIds);
-    }
+//    public List<Label> toEntities(List<Long> labelIds) {
+//        return labelRepository.findByIdIn(labelIds);
+//    }
 
     public List<Long> toIds(Set<Label> labels) {
         return labels == null
@@ -71,4 +71,8 @@ public abstract class TaskMapper {
                 .map(Label::getId)
                 .toList();
     }
+    public Set<Label> toLabelSet(List<Long> taskLabelIds) {
+        return new HashSet<>(labelRepository.findByIdIn(taskLabelIds).orElse(new HashSet<>()));
+    }
+
 }

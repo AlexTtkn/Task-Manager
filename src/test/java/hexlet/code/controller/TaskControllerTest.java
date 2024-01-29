@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.dto.TaskDTO.TaskCreateDTO;
 import hexlet.code.dto.TaskDTO.TaskUpdateDTO;
 import hexlet.code.mapper.TaskMapper;
+import hexlet.code.model.Label;
 import hexlet.code.model.Task;
 import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskRepository;
@@ -196,6 +197,7 @@ class TaskControllerTest {
         data.setTitle(faker.lorem().word() + "aa");
         data.setContent(faker.lorem().sentence());
         data.setStatus(testTask.getTaskStatus().getSlug());
+        data.setTaskLabelIds(List.of(2L));
 
         var request = post("/api/tasks").with(token)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -211,7 +213,6 @@ class TaskControllerTest {
         assertThat(taskRepository.findById(id)).isPresent();
 
         var addedTask = taskRepository.findById(id).orElse(null);
-
         assertThat(addedTask).isNotNull();
         assertThatJson(body).and(
                 v -> v.node("id").isEqualTo(addedTask.getId()),
@@ -220,7 +221,10 @@ class TaskControllerTest {
                 v -> v.node("status").isEqualTo(addedTask.getTaskStatus().getSlug()),
                 v -> v.node("content").isEqualTo(addedTask.getDescription()),
                 v -> v.node("title").isEqualTo(addedTask.getName()),
-                v -> v.node("createdAt").isEqualTo(addedTask.getCreatedAt().format(ModelGenerator.FORMATTER))
+                v -> v.node("createdAt").isEqualTo(addedTask.getCreatedAt().format(ModelGenerator.FORMATTER)),
+                v -> v.node("taskLabelIds").isEqualTo(addedTask.getLabels().stream()
+                        .map(Label::getId)
+                        .toArray())
         );
     }
 
