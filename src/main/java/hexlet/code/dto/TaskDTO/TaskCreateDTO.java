@@ -13,7 +13,6 @@ public class TaskCreateDTO {
 
     private Long index;
 
-
     @JsonProperty("assignee_id")
     private Long assigneeId;
 

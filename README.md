@@ -20,4 +20,4 @@ Username: hexlet@example.com
 Password: qwerty
 ```
 ![First](https://i.postimg.cc/qv6MTvTW/First.jpg)
-- You will find that the user can manage and use all available applications in the same way as users, tasks, task statuses and labels. 
+- You will find the administration dashboard and can explore all available options such as users, tasks, task statuses and labels.
