@@ -6,6 +6,7 @@ import hexlet.code.dto.TaskDTO.TaskParamsDTO;
 import hexlet.code.dto.TaskDTO.TaskUpdateDTO;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.TaskMapper;
+import hexlet.code.model.Label;
 import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class TaskService {
@@ -52,8 +54,6 @@ public class TaskService {
         if (assigneeId != null) {
             var assignee = userRepository.findById(assigneeId).orElse(null);
             task.setAssignee(assignee);
-            assert assignee != null;
-            userRepository.save(assignee);
         }
 
         var statusSlug = dto.getStatus();
@@ -62,8 +62,8 @@ public class TaskService {
 
         var labels = dto.getTaskLabelIds();
         if (!labels.isEmpty()) {
-            var labelSet = taskMapper.toLabelSet(labels);
-            task.setLabels(labelSet);
+            var labelsSet = labelRepository.findByIdIn(labels).orElse(null);
+            task.setLabels(labelsSet);
         }
 
         taskRepository.save(task);
@@ -90,7 +90,6 @@ public class TaskService {
             userRepository.save(assignee);
         }
 
-
         var statusSlug = data.getStatus();
         if (statusSlug != null) {
             var taskStatus = taskStatusRepository.findBySlug((statusSlug).get()).orElse(null);
@@ -98,6 +97,12 @@ public class TaskService {
             assert taskStatus != null;
             taskStatusRepository.save(taskStatus);
 
+        }
+
+        var labels = data.getTaskLabelIds().orElse(null);
+        if (!labels.isEmpty()) {
+            var labelsSet = labelRepository.findByIdIn(labels).orElse(null);
+            task.setLabels(labelsSet);
         }
 
         taskRepository.save(task);
