@@ -52,12 +52,6 @@ public class TaskService {
     public TaskDTO createTask(TaskCreateDTO dto) {
         var task = taskMapper.map(dto);
 
-//        var assigneeId = dto.getAssigneeId();
-//        if (assigneeId != null) {
-//            var assignee = userRepository.findById(assigneeId).orElse(null);
-//            task.setAssignee(assignee);
-//        }
-
         User assignee = null;
         if (dto.getAssigneeId() != null) {
             assignee = userRepository.findById(dto.getAssigneeId()).orElse(null);
@@ -67,12 +61,6 @@ public class TaskService {
         var statusSlug = dto.getStatus();
         var taskStatus = taskStatusRepository.findBySlug(statusSlug).orElse(null);
         task.setTaskStatus(taskStatus);
-
-//        var labels = dto.getTaskLabelIds();
-//        if (labels != null) {
-//            var labelsSet = labelRepository.findByIdIn(labels).orElse(null);
-//            task.setLabels(labelsSet);
-//        }
 
         Set<Label> labelSet = null;
         if (dto.getTaskLabelIds() != null) {
@@ -96,13 +84,6 @@ public class TaskService {
 
         taskMapper.update(data, task);
 
-//        var assigneeId = data.getAssigneeId();
-//        if (assigneeId != null) {
-//            var assignee = userRepository.findById((assigneeId).get()).orElse(null);
-//            task.setAssignee(assignee);
-//            assert assignee != null;
-//            userRepository.save(assignee);
-//        }
         User assignee = null;
         if (data.getTaskLabelIds() != null) {
             assignee = userRepository.findById(data.getAssigneeId().get()).orElse(null);
@@ -111,13 +92,6 @@ public class TaskService {
         }
         task.setAssignee(assignee);
 
-//        var statusSlug = data.getStatus();
-//        if (statusSlug != null) {
-//            var taskStatus = taskStatusRepository.findBySlug((statusSlug).get()).orElse(null);
-//            task.setTaskStatus(taskStatus);
-//            assert taskStatus != null;
-//            taskStatusRepository.save(taskStatus);
-//        }
         TaskStatus taskStatus = null;
         if (data.getStatus() != null) {
             taskStatus = taskStatusRepository.findBySlug((data.getStatus()).get()).orElse(null);
@@ -125,14 +99,6 @@ public class TaskService {
             taskStatusRepository.save(taskStatus);
         }
         task.setTaskStatus(taskStatus);
-
-//        var labels = data.getTaskLabelIds();
-//        if (labels != null) {
-//            var labelSet = labelRepository.findByIdIn((labels).get()).orElse(null);
-//            task.setLabels(labelSet);
-//            assert labelSet != null;
-//            labelRepository.save(labelSet.iterator().next());
-//        }
 
         Set<Label> labelSet = null;
         if (data.getTaskLabelIds() != null) {
