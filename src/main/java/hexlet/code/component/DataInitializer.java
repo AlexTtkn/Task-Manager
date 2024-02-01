@@ -76,4 +76,5 @@ public class DataInitializer implements ApplicationRunner {
             labelRepository.save(label);
         });
     }
+
 }

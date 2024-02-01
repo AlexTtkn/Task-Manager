@@ -60,9 +60,6 @@ public abstract class TaskMapper {
         return taskStatusRepository.findBySlug(slug)
                 .orElseThrow(() -> new ResourceNotFoundException("Status not found"));
     }
-//    public List<Label> toEntities(List<Long> labelIds) {
-//        return labelRepository.findByIdIn(labelIds);
-//    }
 
     public List<Long> toIds(Set<Label> labels) {
         return labels == null
@@ -71,6 +68,7 @@ public abstract class TaskMapper {
                 .map(Label::getId)
                 .toList();
     }
+
     public Set<Label> toLabelSet(List<Long> taskLabelIds) {
         return new HashSet<>(labelRepository.findByIdIn(taskLabelIds).orElse(new HashSet<>()));
     }

@@ -154,7 +154,6 @@ class LabelControllerTest {
                 v -> v.node("name").isEqualTo(addedLabel.getName()),
                 v -> v.node("createdAt").isEqualTo(addedLabel.getCreatedAt().format(ModelGenerator.FORMATTER))
         );
-
     }
 
     @Test
@@ -184,7 +183,6 @@ class LabelControllerTest {
         taskStatus.setName("name");
         taskStatusRepository.save(taskStatus);
 
-
         var task = Instancio.of(modelGenerator.getTaskModel()).create();
         task.setTaskStatus(taskStatus);
         task.getLabels().add(testLabel);
@@ -195,4 +193,5 @@ class LabelControllerTest {
         mockMvc.perform(delete("/api/labels/{id}", label.getId()).with(token))
                 .andExpect(status().isMethodNotAllowed());
     }
+
 }

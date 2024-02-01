@@ -21,4 +21,5 @@ public class UserUpdateDTO {
 
     @Email
     private JsonNullable<String> email;
+
 }

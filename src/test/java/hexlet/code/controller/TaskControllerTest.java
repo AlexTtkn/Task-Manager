@@ -182,7 +182,6 @@ class TaskControllerTest {
                 v -> v.node("status").isEqualTo(testTask.getTaskStatus().getSlug().toLowerCase()),
                 v -> v.node("assignee_id").isEqualTo(testTask.getAssignee().getId()),
                 v -> v.node("createdAt").isEqualTo(testTask.getCreatedAt().format(ModelGenerator.FORMATTER))
-
         );
     }
 
@@ -256,7 +255,6 @@ class TaskControllerTest {
         assertThat(updatedTask.getName()).isEqualTo(updateDTO.getTitle().get());
         assertThat(updatedTask.getDescription()).isEqualTo(updateDTO.getContent().get());
         assertThat(updatedTask.getTaskStatus().getSlug()).isEqualTo(updateDTO.getStatus().get());
- //       assertThat(updatedTask.getAssignee().getId()).isEqualTo(updateDTO.getAssigneeId().get());
     }
 
     @Test
@@ -284,4 +282,5 @@ class TaskControllerTest {
         mockMvc.perform(request)
                 .andExpect(status().isUnauthorized());
     }
+
 }

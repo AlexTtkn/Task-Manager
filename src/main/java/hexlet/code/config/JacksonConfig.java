@@ -8,6 +8,7 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 @Configuration
 public class JacksonConfig {
+
     @Bean
     Jackson2ObjectMapperBuilder objectMapperBuilder() {
         var builder = new Jackson2ObjectMapperBuilder();
@@ -15,4 +16,5 @@ public class JacksonConfig {
                 .modulesToInstall(new JsonNullableModule());
         return builder;
     }
+
 }
