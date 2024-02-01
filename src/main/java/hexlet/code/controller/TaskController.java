@@ -6,8 +6,9 @@ import hexlet.code.dto.TaskDTO.TaskParamsDTO;
 import hexlet.code.dto.TaskDTO.TaskUpdateDTO;
 import hexlet.code.service.TaskService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,14 +23,17 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/tasks")
+@AllArgsConstructor
 public class TaskController {
 
-    @Autowired
     private TaskService taskService;
 
     @GetMapping
-    public List<TaskDTO> index(TaskParamsDTO paramsDTO) {
-        return taskService.getAllTasks(paramsDTO);
+    public ResponseEntity<List<TaskDTO>> index(TaskParamsDTO paramsDTO) {
+        var result = taskService.getAllTasks(paramsDTO);
+        return ResponseEntity.ok()
+                .header("X-Total-Count", String.valueOf(result.size()))
+                .body(result);
     }
 
     @GetMapping("/{id}")
