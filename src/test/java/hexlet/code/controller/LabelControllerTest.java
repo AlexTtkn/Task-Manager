@@ -80,7 +80,6 @@ class LabelControllerTest {
         }
     }
 
-
     @Test
     public void testIndex() throws Exception {
         var request = get("/api/labels").with(token);

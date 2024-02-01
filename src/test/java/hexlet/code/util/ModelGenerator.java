@@ -69,4 +69,5 @@ public class ModelGenerator {
                 .supply(Select.field(User::getPasswordDigest), () -> faker.internet().password(3, 12))
                 .toModel();
     }
+
 }

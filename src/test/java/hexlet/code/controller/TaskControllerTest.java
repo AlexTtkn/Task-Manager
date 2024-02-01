@@ -227,7 +227,6 @@ class TaskControllerTest {
         );
     }
 
-
     @Test
     @Transactional
     public void testUpdate() throws Exception {
