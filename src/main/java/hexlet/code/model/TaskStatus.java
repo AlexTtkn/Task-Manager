@@ -28,11 +28,11 @@ public class TaskStatus implements BaseEntity {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @Column(unique = true)
+    @Column(name = "name", unique = true)
     @NotBlank
     private String name;
 
-    @Column(unique = true)
+    @Column(name = "slug", unique = true)
     @NotBlank
     private String slug;
 

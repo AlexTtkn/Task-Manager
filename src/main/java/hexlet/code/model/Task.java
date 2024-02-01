@@ -1,5 +1,6 @@
 package hexlet.code.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
@@ -34,15 +35,17 @@ public class Task implements BaseEntity {
     private Long id;
 
     @NotBlank
+    @Column(name = "name")
     private String name;
 
+    @Column(name = "index")
     private Long index;
 
+    @Column(name = "description")
     private String description;
 
     @CreatedDate
     private LocalDate createdAt;
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "task_status_id")

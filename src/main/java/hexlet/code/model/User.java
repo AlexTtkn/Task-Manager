@@ -34,16 +34,19 @@ public class User implements UserDetails, BaseEntity {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
+    @Column(name = "firstName")
     private String firstName;
 
+    @Column(name = "lastName")
     private String lastName;
 
     @Email
-    @Column(unique = true)
+    @Column(name = "email", unique = true)
     private String email;
 
     @NotBlank
     @Size(min = 3)
+    @Column(name = "passwordDigest")
     private String passwordDigest;
 
     @CreatedDate
