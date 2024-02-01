@@ -7,7 +7,6 @@ import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.UserMapper;
 import hexlet.code.repository.UserRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,15 +16,9 @@ import java.util.List;
 @AllArgsConstructor
 public class UserService {
 
-    @Autowired
     private UserRepository userRepository;
-
-    @Autowired
     private UserMapper userMapper;
-
-    @Autowired
     private final PasswordEncoder passwordEncoder;
-
 
     public List<UserDTO> getAllUsers() {
         return userRepository.findAll().stream()

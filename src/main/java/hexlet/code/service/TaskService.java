@@ -14,32 +14,21 @@ import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.specification.TaskSpecification;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
 
 @Service
+@AllArgsConstructor
 public class TaskService {
 
-    @Autowired
     private TaskRepository taskRepository;
-
-    @Autowired
     private TaskMapper taskMapper;
-
-    @Autowired
     private TaskStatusRepository taskStatusRepository;
-
-    @Autowired
     private UserRepository userRepository;
-
-    @Autowired
     private LabelRepository labelRepository;
-
-
-    @Autowired
     private TaskSpecification specBuilder;
 
     public List<TaskDTO> getAllTasks(TaskParamsDTO paramsDTO) {
