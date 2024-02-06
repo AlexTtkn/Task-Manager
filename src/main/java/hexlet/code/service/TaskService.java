@@ -22,7 +22,7 @@ import java.util.Set;
 
 @Service
 @AllArgsConstructor
-public class    TaskService {
+public class TaskService {
 
     private TaskRepository taskRepository;
     private TaskMapper taskMapper;
