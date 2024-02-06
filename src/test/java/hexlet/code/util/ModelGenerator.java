@@ -66,7 +66,7 @@ public class ModelGenerator {
                 .supply(Select.field(User::getEmail), () -> faker.internet().emailAddress())
                 .supply(Select.field(User::getFirstName), () -> faker.name().firstName())
                 .supply(Select.field(User::getLastName), () -> faker.name().lastName())
-                .supply(Select.field(User::getPasswordDigest), () -> faker.internet().password(3, 12))
+                .supply(Select.field(User::getPassword), () -> faker.internet().password(3, 12))
                 .toModel();
     }
 

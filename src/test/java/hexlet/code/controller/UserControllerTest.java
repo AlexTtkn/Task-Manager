@@ -102,7 +102,7 @@ class UserControllerTest {
         data.setFirstName(JsonNullable.of(faker.name().firstName()));
         data.setLastName(JsonNullable.of(faker.name().lastName()));
         data.setEmail(JsonNullable.of(faker.internet().emailAddress()));
-        data.setPasswordDigest(JsonNullable.of(faker.internet().password(3, 12)));
+        data.setPassword(JsonNullable.of(faker.internet().password(3, 12)));
 
         var request = put("/api/users/{id}", testUser.getId()).with(token)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -117,7 +117,7 @@ class UserControllerTest {
         assertThat(updatedUser.getEmail()).isEqualTo(data.getEmail().get());
         assertThat(updatedUser.getFirstName()).isEqualTo(data.getFirstName().get());
         assertThat(updatedUser.getLastName()).isEqualTo(data.getLastName().get());
-        assertThat(updatedUser.getPasswordDigest()).isNotEqualTo(data.getPasswordDigest().get());
+        assertThat(updatedUser.getPassword()).isNotEqualTo(data.getPassword().get());
     }
 
     @Test
@@ -126,7 +126,7 @@ class UserControllerTest {
         data.setFirstName(faker.name().firstName());
         data.setLastName(faker.name().lastName());
         data.setEmail(faker.internet().emailAddress());
-        data.setPasswordDigest(faker.internet().password(3, 12));
+        data.setPassword(faker.internet().password(3, 12));
 
         var request = post("/api/users").with(token)
                 .contentType(MediaType.APPLICATION_JSON)

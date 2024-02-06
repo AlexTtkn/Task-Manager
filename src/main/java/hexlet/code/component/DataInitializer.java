@@ -39,10 +39,10 @@ public class DataInitializer implements ApplicationRunner {
     private void addAdminUser() {
         var userData = new UserCreateDTO();
         userData.setEmail("hexlet@example.com");
-        userData.setPasswordDigest("qwerty");
+        userData.setPassword("qwerty");
         var user = userMapper.map(userData);
         var hashedPassword = passwordEncoder.encode(user.getPassword());
-        user.setPasswordDigest(hashedPassword);
+        user.setPassword(hashedPassword);
         userRepository.save(user);
     }
 
