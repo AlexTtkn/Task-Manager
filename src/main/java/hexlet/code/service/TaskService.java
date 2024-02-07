@@ -76,24 +76,18 @@ public class TaskService {
         User assignee = null;
         if (data.getTaskLabelIds() != null) {
             assignee = userRepository.findById(data.getAssigneeId().get()).orElse(null);
-//            assert assignee != null;
-//            userRepository.save(assignee);
         }
         task.setAssignee(assignee);
 
         TaskStatus taskStatus = null;
         if (data.getStatus() != null) {
-            taskStatus = taskStatusRepository.findBySlug((data.getStatus()).get()).orElse(null);
-//            assert taskStatus != null;
-//            taskStatusRepository.save(taskStatus);
+            taskStatus = taskStatusRepository.findBySlug(data.getStatus().get()).orElse(null);
         }
         task.setTaskStatus(taskStatus);
 
         Set<Label> labelSet = null;
         if (data.getTaskLabelIds() != null) {
             labelSet = labelRepository.findByIdIn((data.getTaskLabelIds()).get()).orElse(null);
-//            assert labelSet != null;
-//            labelRepository.save(labelSet.iterator().next());
         }
         task.setLabels(labelSet);
 

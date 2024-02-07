@@ -55,8 +55,8 @@ public class DataInitializer implements ApplicationRunner {
             var name = new StringBuilder(first);
 
             if (arr.length > 1) {
-                for (var element: arr) {
-                    name.append(" ").append(element);
+                for (int i = 1; i <= arr.length - 1; i++) {
+                    name.append(" ").append(arr[i]);
                 }
             }
 
