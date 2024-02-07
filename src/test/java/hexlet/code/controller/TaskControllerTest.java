@@ -238,8 +238,8 @@ class TaskControllerTest {
         updateDTO.setAssigneeId(JsonNullable.of(testTask.getAssignee().getId()));
         updateDTO.setTitle(JsonNullable.of(faker.lorem().word() + "aa"));
         updateDTO.setContent(JsonNullable.of(faker.lorem().sentence()));
-        updateDTO.setStatus(JsonNullable.of(faker.lorem().word()));
-//        updateDTO.setStatus(JsonNullable.of("published"));
+ //       updateDTO.setStatus(JsonNullable.of(faker.lorem().word()));
+        updateDTO.setStatus(JsonNullable.of("published"));
 
         var request = put("/api/tasks/{id}", testTask.getId()).with(token)
                 .contentType(MediaType.APPLICATION_JSON)
