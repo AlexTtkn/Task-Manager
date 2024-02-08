@@ -35,11 +35,11 @@ public abstract class TaskMapper {
     @Autowired
     private LabelRepository labelRepository;
 
-    @Mapping(source = "assigneeId", target = "assignee.id")
-    @Mapping(source = "status", target = "taskStatus.slug")
     @Mapping(source = "title", target = "name")
     @Mapping(source = "content", target = "description")
-    @Mapping(source = "taskLabelIds", target = "labels")
+    @Mapping(target = "taskStatus.slug", ignore = true)
+    @Mapping(target = "assignee.id", ignore = true)
+    @Mapping(target = "labels", ignore = true)
     public abstract Task map(TaskCreateDTO taskCreateDTO);
 
     @Mapping(source = "assignee.id", target = "assigneeId")
@@ -49,11 +49,11 @@ public abstract class TaskMapper {
     @Mapping(source = "labels", target = "taskLabelIds")
     public abstract TaskDTO map(Task task);
 
-    @Mapping(source = "assigneeId", target = "assignee.id")
-    @Mapping(source = "status", target = "taskStatus.slug")
     @Mapping(source = "title", target = "name")
     @Mapping(source = "content", target = "description")
-    @Mapping(source = "taskLabelIds", target = "labels")
+    @Mapping(target = "taskStatus.slug", ignore = true)
+    @Mapping(target = "assignee.id", ignore = true)
+    @Mapping(target = "labels", ignore = true)
     public abstract void update(TaskUpdateDTO data, @MappingTarget Task model);
 
     public TaskStatus toEntity(String slug) {

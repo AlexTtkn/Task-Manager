@@ -47,8 +47,10 @@ public class TaskService {
         }
         task.setAssignee(assignee);
 
-        var statusSlug = dto.getStatus();
-        var taskStatus = taskStatusRepository.findBySlug(statusSlug).orElse(null);
+        TaskStatus taskStatus = null;
+        if (dto.getStatus() != null) {
+            taskStatus = taskStatusRepository.findBySlug(dto.getStatus()).orElse(null);
+        }
         task.setTaskStatus(taskStatus);
 
         Set<Label> labelSet = null;
@@ -74,7 +76,7 @@ public class TaskService {
         taskMapper.update(data, task);
 
         User assignee = null;
-        if (data.getTaskLabelIds() != null) {
+        if (data.getAssigneeId() != null) {
             assignee = userRepository.findById(data.getAssigneeId().get()).orElse(null);
         }
         task.setAssignee(assignee);
@@ -82,8 +84,8 @@ public class TaskService {
         TaskStatus taskStatus = null;
         if (data.getStatus() != null) {
             taskStatus = taskStatusRepository.findBySlug(data.getStatus().get()).orElse(null);
+            task.setTaskStatus(taskStatus);
         }
-        task.setTaskStatus(taskStatus);
 
         Set<Label> labelSet = null;
         if (data.getTaskLabelIds() != null) {

@@ -3,7 +3,8 @@ package hexlet.code.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.dto.TaskDTO.TaskCreateDTO;
 import hexlet.code.dto.TaskDTO.TaskUpdateDTO;
-import hexlet.code.mapper.TaskMapper;
+import hexlet.code.dto.TaskStatusDTO.TaskStatusCreateDTO;
+import hexlet.code.mapper.TaskStatusMapper;
 import hexlet.code.model.Label;
 import hexlet.code.model.Task;
 import hexlet.code.repository.LabelRepository;
@@ -34,8 +35,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -65,7 +66,7 @@ class TaskControllerTest {
     private LabelRepository labelRepository;
 
     @Autowired
-    private TaskMapper taskMapper;
+    private TaskStatusMapper taskStatusMapper;
 
     @Autowired
     private ModelGenerator modelGenerator;
@@ -217,10 +218,10 @@ class TaskControllerTest {
                 v -> v.node("id").isEqualTo(addedTask.getId()),
                 v -> v.node("index").isEqualTo(addedTask.getIndex()),
                 v -> v.node("assignee_id").isEqualTo(addedTask.getAssignee().getId()),
-                v -> v.node("status").isEqualTo(addedTask.getTaskStatus().getSlug()),
                 v -> v.node("content").isEqualTo(addedTask.getDescription()),
                 v -> v.node("title").isEqualTo(addedTask.getName()),
                 v -> v.node("createdAt").isEqualTo(addedTask.getCreatedAt().format(ModelGenerator.FORMATTER)),
+                v -> v.node("status").isEqualTo(addedTask.getTaskStatus().getSlug()),
                 v -> v.node("taskLabelIds").isEqualTo(addedTask.getLabels().stream()
                         .map(Label::getId)
                         .toArray())
@@ -233,13 +234,18 @@ class TaskControllerTest {
         testTask = generateTask();
         taskRepository.save(testTask);
 
+        var statusCreateDTO = new TaskStatusCreateDTO();
+        statusCreateDTO.setName("To test");
+        statusCreateDTO.setSlug("to test");
+        var status = taskStatusMapper.map(statusCreateDTO);
+        taskStatusRepository.save(status);
+
         var updateDTO = new TaskUpdateDTO();
         updateDTO.setIndex(JsonNullable.of(faker.number().randomNumber()));
         updateDTO.setAssigneeId(JsonNullable.of(testTask.getAssignee().getId()));
         updateDTO.setTitle(JsonNullable.of(faker.lorem().word() + "aa"));
         updateDTO.setContent(JsonNullable.of(faker.lorem().sentence()));
- //       updateDTO.setStatus(JsonNullable.of(faker.lorem().word()));
-        updateDTO.setStatus(JsonNullable.of("published"));
+        updateDTO.setStatus(JsonNullable.of("to test"));
 
         var request = put("/api/tasks/{id}", testTask.getId()).with(token)
                 .contentType(MediaType.APPLICATION_JSON)
