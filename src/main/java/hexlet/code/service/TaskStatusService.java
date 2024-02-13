@@ -3,8 +3,10 @@ package hexlet.code.service;
 import hexlet.code.dto.TaskStatusDTO.TaskStatusCreateDTO;
 import hexlet.code.dto.TaskStatusDTO.TaskStatusDTO;
 import hexlet.code.dto.TaskStatusDTO.TaskStatusUpdateDTO;
+import hexlet.code.exception.MethodNotAllowedException;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.TaskStatusMapper;
+import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ public class TaskStatusService {
 
     private TaskStatusRepository taskStatusRepository;
     private TaskStatusMapper taskStatusMapper;
+    private TaskRepository taskRepository;
 
     public List<TaskStatusDTO> getAllStatuses() {
         return taskStatusRepository.findAll().stream()
@@ -45,6 +48,10 @@ public class TaskStatusService {
     }
 
     public void deleteStatus(Long statusId) {
+        var taskStatus = taskStatusRepository.findById(statusId);
+        if (taskStatus.isPresent() && taskRepository.findByTaskStatusName(taskStatus.get().getName()).isPresent()) {
+            throw new MethodNotAllowedException("TaskStatus still has task");
+        }
         taskStatusRepository.deleteById(statusId);
     }
 
