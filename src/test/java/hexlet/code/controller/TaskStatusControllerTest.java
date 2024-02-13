@@ -3,7 +3,6 @@ package hexlet.code.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.dto.TaskStatusDTO.TaskStatusCreateDTO;
 import hexlet.code.dto.TaskStatusDTO.TaskStatusUpdateDTO;
-import hexlet.code.model.Label;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
