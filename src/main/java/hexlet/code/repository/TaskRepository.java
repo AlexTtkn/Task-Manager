@@ -12,7 +12,7 @@ public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificat
 
     Optional<Task> findByName(String name);
     Optional<Task> findByLabelsName(String name);
-
     Optional<Task> findByTaskStatusName(String name);
+    Optional<Task> findByAssigneeEmail(String email);
 
 }

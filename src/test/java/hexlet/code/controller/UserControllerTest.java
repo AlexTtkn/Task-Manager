@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.dto.UserDTO.UserCreateDTO;
 import hexlet.code.dto.UserDTO.UserUpdateDTO;
 import hexlet.code.model.User;
+import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.util.ModelGenerator;
 import net.datafaker.Faker;
@@ -46,6 +47,9 @@ class UserControllerTest {
     private UserRepository userRepository;
 
     @Autowired
+    private TaskRepository taskRepository;
+
+    @Autowired
     private ModelGenerator modelGenerator;
 
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
@@ -61,6 +65,7 @@ class UserControllerTest {
 
     @AfterEach
     public void cleanUp() {
+        taskRepository.deleteAll();
         if (testUser != null) {
             userRepository.deleteById(testUser.getId());
         }
@@ -104,6 +109,8 @@ class UserControllerTest {
         data.setEmail(JsonNullable.of(faker.internet().emailAddress()));
         data.setPassword(JsonNullable.of(faker.internet().password(3, 12)));
 
+        token = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
+
         var request = put("/api/users/{id}", testUser.getId()).with(token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(data));
@@ -125,6 +132,8 @@ class UserControllerTest {
         var data = new UserUpdateDTO();
         data.setFirstName(JsonNullable.of(faker.name().firstName()));
         data.setLastName(JsonNullable.of(faker.name().lastName()));
+
+        token = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
 
         var request = put("/api/users/{id}", testUser.getId()).with(token)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -177,6 +186,8 @@ class UserControllerTest {
 
     @Test
     public void testDestroy() throws Exception {
+        token = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
+
         var request = delete("/api/users/{id}", testUser.getId()).with(token);
         mockMvc.perform(request)
                 .andExpect(status().isNoContent());
@@ -192,6 +203,20 @@ class UserControllerTest {
 
         mockMvc.perform(request)
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void testDestroyButHasTask() throws Exception {
+        var task = Instancio.of(modelGenerator.getTaskModel()).create();
+        task.setAssignee(testUser);
+        taskRepository.save(task);
+
+        var user = task.getAssignee();
+
+        token = jwt().jwt(builder -> builder.subject(user.getEmail()));
+
+        mockMvc.perform(delete("/api/users/{id}", user.getId()).with(token))
+                .andExpect(status().isMethodNotAllowed());
     }
 
 }

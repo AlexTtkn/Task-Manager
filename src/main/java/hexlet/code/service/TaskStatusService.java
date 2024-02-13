@@ -49,6 +49,7 @@ public class TaskStatusService {
 
     public void deleteStatus(Long statusId) {
         var taskStatus = taskStatusRepository.findById(statusId);
+
         if (taskStatus.isPresent() && taskRepository.findByTaskStatusName(taskStatus.get().getName()).isPresent()) {
             throw new MethodNotAllowedException("TaskStatus still has task");
         }

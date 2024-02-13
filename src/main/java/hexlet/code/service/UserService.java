@@ -3,8 +3,10 @@ package hexlet.code.service;
 import hexlet.code.dto.UserDTO.UserCreateDTO;
 import hexlet.code.dto.UserDTO.UserDTO;
 import hexlet.code.dto.UserDTO.UserUpdateDTO;
+import hexlet.code.exception.MethodNotAllowedException;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.UserMapper;
+import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,6 +21,7 @@ public class UserService {
     private UserRepository userRepository;
     private UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private TaskRepository taskRepository;
 
     public List<UserDTO> getAllUsers() {
         return userRepository.findAll().stream()
@@ -54,6 +57,11 @@ public class UserService {
     }
 
     public void deleteUser(Long userId) {
+        var user = userRepository.findById(userId);
+
+        if (user.isPresent() && taskRepository.findByAssigneeEmail(user.get().getEmail()).isPresent()) {
+            throw new MethodNotAllowedException("User still has task");
+        }
         userRepository.deleteById(userId);
     }
 
