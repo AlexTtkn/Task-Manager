@@ -3,7 +3,9 @@ package hexlet.code.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.dto.TaskStatusDTO.TaskStatusCreateDTO;
 import hexlet.code.dto.TaskStatusDTO.TaskStatusUpdateDTO;
+import hexlet.code.model.Label;
 import hexlet.code.model.TaskStatus;
+import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.util.ModelGenerator;
 import net.datafaker.Faker;
@@ -47,6 +49,9 @@ class TaskStatusControllerTest {
     private TaskStatusRepository taskStatusRepository;
 
     @Autowired
+    private TaskRepository taskRepository;
+
+    @Autowired
     private ModelGenerator modelGenerator;
 
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
@@ -62,6 +67,7 @@ class TaskStatusControllerTest {
 
     @AfterEach
     public void cleanUp() {
+        taskRepository.deleteAll();
         if (testTaskStatus != null) {
             taskStatusRepository.deleteById(testTaskStatus.getId());
         }
@@ -117,6 +123,26 @@ class TaskStatusControllerTest {
     }
 
     @Test
+    public void testPartialUpdate() throws Exception {
+        var data = new TaskStatusUpdateDTO();
+        data.setName(JsonNullable.of(faker.name().name()));
+
+
+        var request = put("/api/task_statuses/{id}", testTaskStatus.getId()).with(token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(data));
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk());
+
+        var updatedTaskStatus = taskStatusRepository.findById(testTaskStatus.getId()).orElse(null);
+
+        Assertions.assertThat(updatedTaskStatus).isNotNull();
+        Assertions.assertThat(updatedTaskStatus.getName()).isEqualTo(data.getName().get());
+        Assertions.assertThat(updatedTaskStatus.getSlug()).isEqualTo(testTaskStatus.getSlug());
+    }
+
+    @Test
     public void testCreate() throws Exception {
         var data = new TaskStatusCreateDTO();
         data.setName(faker.name().name());
@@ -163,6 +189,18 @@ class TaskStatusControllerTest {
 
         mockMvc.perform(request)
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void testDestroyButHasTask() throws Exception {
+        var task = Instancio.of(modelGenerator.getTaskModel()).create();
+        task.setTaskStatus(testTaskStatus);
+        taskRepository.save(task);
+
+        var taskStatus = task.getTaskStatus();
+
+        mockMvc.perform(delete("/api/task_statuses/{id}", taskStatus.getId()).with(token))
+                .andExpect(status().isMethodNotAllowed());
     }
 
 }

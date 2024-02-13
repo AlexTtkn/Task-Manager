@@ -121,6 +121,28 @@ class UserControllerTest {
     }
 
     @Test
+    public void testPartialUpdate() throws Exception {
+        var data = new UserUpdateDTO();
+        data.setFirstName(JsonNullable.of(faker.name().firstName()));
+        data.setLastName(JsonNullable.of(faker.name().lastName()));
+
+        var request = put("/api/users/{id}", testUser.getId()).with(token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(data));
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk());
+
+        var updatedUser = userRepository.findById(testUser.getId()).orElse(null);
+
+        assertThat(updatedUser).isNotNull();
+        assertThat(updatedUser.getEmail()).isEqualTo(testUser.getEmail());
+        assertThat(updatedUser.getFirstName()).isEqualTo(data.getFirstName().get());
+        assertThat(updatedUser.getLastName()).isEqualTo(data.getLastName().get());
+        assertThat(updatedUser.getPassword()).isNotEqualTo(testUser.getPassword());
+    }
+
+    @Test
     public void testCreate() throws Exception {
         var data = new UserCreateDTO();
         data.setFirstName(faker.name().firstName());

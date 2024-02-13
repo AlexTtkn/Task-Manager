@@ -53,9 +53,6 @@ class LabelControllerTest {
     private TaskRepository taskRepository;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private TaskStatusRepository taskStatusRepository;
 
     @Autowired
@@ -177,13 +174,7 @@ class LabelControllerTest {
 
     @Test
     public void testDestroyButHasTask() throws Exception {
-        TaskStatus taskStatus = new TaskStatus();
-        taskStatus.setSlug("slug");
-        taskStatus.setName("name");
-        taskStatusRepository.save(taskStatus);
-
         var task = Instancio.of(modelGenerator.getTaskModel()).create();
-        task.setTaskStatus(taskStatus);
         task.getLabels().add(testLabel);
         taskRepository.save(task);
 
